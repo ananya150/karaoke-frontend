@@ -8,7 +8,8 @@ import {
   VolumeX,
   Music,
   Download,
-  Home
+  Home,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,27 +17,13 @@ import { api } from '@/lib/api';
 import { JobResultsResponse } from '@/types/api';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
 interface AudioStudioProps {
   jobId: string;
 }
 
-interface TrackState {
-  isMuted: boolean;
-  volume: number;
-}
 
-interface StudioState {
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
-  tracks: {
-    vocals: TrackState;
-    drums: TrackState;
-    bass: TrackState;
-    other: TrackState;
-  };
-}
 
 // Mock waveform data - in a real implementation, this would be generated from the audio files
 const generateMockWaveform = (duration: number, density: number = 200) => {
@@ -128,10 +115,17 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
   };
 
   const timeMarkers = [];
-  const interval = Math.ceil(duration / 8); // Show ~8 markers
+  // Ensure duration is valid and interval is at least 1 second
+  const safeDuration = Math.max(1, duration || 1);
+  const interval = Math.max(1, Math.ceil(safeDuration / 8)); // Show ~8 markers
   
-  for (let i = 0; i <= duration; i += interval) {
+  // Limit the number of markers to prevent infinite loops
+  const maxMarkers = 20;
+  let markerCount = 0;
+  
+  for (let i = 0; i <= safeDuration && markerCount < maxMarkers; i += interval) {
     timeMarkers.push(i);
+    markerCount++;
   }
 
   return (
@@ -140,7 +134,7 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
         <div 
           key={index}
           className="absolute bottom-0 text-xs text-gray-400"
-          style={{ left: `${12 + (time / duration) * (100 - 24)}%` }}
+          style={{ left: `${12 + (time / safeDuration) * (100 - 24)}%` }}
         >
           <div className="w-px h-4 bg-gray-600 mb-1"></div>
           {formatTime(time)}
@@ -150,7 +144,7 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
       {/* Current time cursor */}
       <div 
         className="absolute top-0 w-px h-full bg-white shadow-lg transition-all duration-100"
-        style={{ left: `${12 + (currentTime / duration) * (100 - 24)}%` }}
+        style={{ left: `${12 + (currentTime / safeDuration) * (100 - 24)}%` }}
       >
         <div className="w-3 h-3 bg-white rounded-full transform -translate-x-1/2 -translate-y-1"></div>
       </div>
@@ -162,19 +156,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   const [results, setResults] = useState<JobResultsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [studioState, setStudioState] = useState<StudioState>({
-    isPlaying: false,
-    currentTime: 0,
-    duration: 0,
-    tracks: {
-      vocals: { isMuted: false, volume: 75 },
-      drums: { isMuted: false, volume: 75 },
-      bass: { isMuted: false, volume: 75 },
-      other: { isMuted: false, volume: 75 },
-    }
-  });
+  const [minLoadingComplete, setMinLoadingComplete] = useState(false);
 
   // Mock waveform data
   const [waveforms] = useState({
@@ -184,17 +166,36 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     other: generateMockWaveform(200),
   });
 
-  // Fetch job results on mount
+  // Audio player hook
+  const audioPlayer = useAudioPlayer();
+
+  // Debug logging with render counter
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  console.log(`AudioStudio render #${renderCountRef.current}:`, { 
+    isLoading, 
+    minLoadingComplete, 
+    hasResults: !!results, 
+    error,
+    audioPlayerLoading: audioPlayer.isLoading 
+  });
+
+  // Minimum loading time to prevent flickering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingComplete(true);
+    }, 1000); // Minimum 1 second loading
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Fetch job results
   useEffect(() => {
     const fetchResults = async () => {
       try {
         setIsLoading(true);
         const jobResults = await api.getJobResults(jobId);
         setResults(jobResults);
-        setStudioState(prev => ({
-          ...prev,
-          duration: jobResults.audio_duration || 180 // fallback to 3 minutes if not available
-        }));
       } catch (err) {
         console.error('Failed to fetch job results:', err);
         setError(err instanceof Error ? err.message : 'Failed to load audio files');
@@ -209,63 +210,124 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     fetchResults();
   }, [jobId]);
 
-  // Playback simulation
+  // Load audio tracks when results are available
   useEffect(() => {
-    if (studioState.isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setStudioState(prev => {
-          const newTime = prev.currentTime + 0.1;
-          if (newTime >= prev.duration) {
-            return { ...prev, currentTime: prev.duration, isPlaying: false };
-          }
-          return { ...prev, currentTime: newTime };
-        });
-      }, 100);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+    console.log('Audio loading effect triggered:', { hasResults: !!results, jobId });
+    if (!results) {
+      console.log('No results, skipping audio loading');
+      return;
     }
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [studioState.isPlaying, studioState.duration]);
+    console.log('Results available, checking download links:', results.download_links);
+    console.log('Full results object:', results);
+    let isCancelled = false;
 
-  const handlePlayPause = () => {
-    setStudioState(prev => ({
-      ...prev,
-      isPlaying: !prev.isPlaying
-    }));
-  };
-
-  const handleTrackMute = (trackName: keyof StudioState['tracks']) => {
-    setStudioState(prev => ({
-      ...prev,
-      tracks: {
-        ...prev.tracks,
-        [trackName]: {
-          ...prev.tracks[trackName],
-          isMuted: !prev.tracks[trackName].isMuted
+    const loadAudioTracks = async () => {
+      try {
+        // Prepare track URLs for audio loading
+        const trackUrls: Record<string, string> = {};
+        
+        if (results.download_links.vocals_stem) {
+          trackUrls.vocals = api.getFileDownloadURL(jobId, results.download_links.vocals_stem.split('/').pop() || '');
+        }
+        if (results.download_links.drums_stem) {
+          trackUrls.drums = api.getFileDownloadURL(jobId, results.download_links.drums_stem.split('/').pop() || '');
+        }
+        if (results.download_links.bass_stem) {
+          trackUrls.bass = api.getFileDownloadURL(jobId, results.download_links.bass_stem.split('/').pop() || '');
+        }
+        if (results.download_links.other_stem) {
+          trackUrls.other = api.getFileDownloadURL(jobId, results.download_links.other_stem.split('/').pop() || '');
+        }
+        
+        // Load audio tracks
+        if (Object.keys(trackUrls).length > 0 && !isCancelled) {
+          console.log('Loading audio tracks:', trackUrls);
+          await audioPlayer.loadTracks(trackUrls);
+          if (!isCancelled) {
+            toast.success('Audio tracks loaded successfully!');
+          }
+        } else {
+          console.warn('No audio track URLs found. Available download links:', Object.keys(results.download_links));
+          if (!isCancelled) {
+            toast.error('No audio tracks available', {
+              description: 'The processed audio files could not be found.'
+            });
+          }
+        }
+        
+      } catch (audioError) {
+        if (!isCancelled) {
+          console.error('Failed to load audio tracks:', audioError);
+          toast.error('Failed to load audio tracks', {
+            description: 'Audio playback may not work properly.'
+          });
         }
       }
-    }));
+    };
+
+    loadAudioTracks();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [results, jobId]); // Remove audioPlayer from dependencies
+
+  const handlePlayPause = async () => {
+    console.log('Play button clicked. Current state:', {
+      isPlaying: audioPlayer.isPlaying,
+      duration: audioPlayer.duration,
+      currentTime: audioPlayer.currentTime,
+      trackStates: audioPlayer.trackStates,
+      isLoading: audioPlayer.isLoading,
+      error: audioPlayer.error
+    });
+    
+    try {
+      // Check if any tracks are loaded
+      const loadedTracks = Object.values(audioPlayer.trackStates).filter(state => state.isLoaded);
+      if (loadedTracks.length === 0) {
+        console.warn('No audio tracks loaded, cannot play');
+        toast.error('No audio tracks loaded', {
+          description: 'Please wait for audio tracks to load or check if processing completed successfully.'
+        });
+        return;
+      }
+
+      if (audioPlayer.isPlaying) {
+        console.log('Pausing audio...');
+        audioPlayer.pause();
+      } else {
+        console.log('Starting audio playback...');
+        await audioPlayer.play();
+      }
+    } catch (error) {
+      console.error('Failed to toggle playback:', error);
+      toast.error('Playback failed', {
+        description: 'Please check if audio tracks are loaded properly.'
+      });
+    }
   };
 
-  const handleTimelineClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleTrackMute = (trackName: string) => {
+    console.log('Track mute clicked:', trackName, 'Current state:', audioPlayer.trackStates[trackName]);
+    audioPlayer.toggleTrackMuted(trackName);
+    console.log('After mute toggle:', audioPlayer.trackStates[trackName]);
+  };
+
+  const handleTimelineClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const clickX = event.clientX - rect.left - 48; // Subtract left padding
     const timelineWidth = rect.width - 96; // Subtract both side paddings
     const clickPercentage = Math.max(0, Math.min(1, clickX / timelineWidth));
-    const newTime = clickPercentage * studioState.duration;
+    const newTime = clickPercentage * audioPlayer.duration;
     
-    setStudioState(prev => ({
-      ...prev,
-      currentTime: newTime
-    }));
+    try {
+      await audioPlayer.seek(newTime);
+    } catch (error) {
+      console.error('Failed to seek:', error);
+      toast.error('Seek failed');
+    }
   };
 
   const formatTime = (seconds: number): string => {
@@ -278,13 +340,15 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     return api.getFileDownloadURL(jobId, filename);
   };
 
-  if (isLoading) {
+  if (isLoading || !minLoadingComplete) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <Music className="h-12 w-12 text-blue-500 animate-pulse mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white mb-2">Loading Audio Studio</h2>
-          <p className="text-gray-400">Fetching your processed audio files...</p>
+          <p className="text-gray-400">
+            {isLoading ? 'Fetching your processed audio files...' : 'Preparing audio interface...'}
+          </p>
         </div>
       </div>
     );
@@ -322,6 +386,9 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
             <h1 className="text-lg font-semibold text-white">{results.original_filename}</h1>
             <p className="text-sm text-gray-400">
               {formatTime(results.audio_duration)} • {results.beat_analysis.tempo_bpm.toFixed(1)} BPM
+              {audioPlayer.isLoading && (
+                <span className="ml-2 text-yellow-400">• Loading audio...</span>
+              )}
             </p>
           </div>
         </div>
@@ -363,8 +430,11 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               onClick={handlePlayPause}
               size="sm"
               className="w-10 h-10 rounded-full bg-white text-black hover:bg-gray-200"
+              disabled={audioPlayer.isLoading}
             >
-              {studioState.isPlaying ? (
+              {audioPlayer.isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : audioPlayer.isPlaying ? (
                 <Pause className="h-4 w-4" />
               ) : (
                 <Play className="h-4 w-4" />
@@ -372,7 +442,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
             </Button>
             
             <div className="text-white text-sm font-mono">
-              {formatTime(studioState.currentTime)}
+              {audioPlayer.formatTime(audioPlayer.currentTime)}
             </div>
           </div>
 
@@ -417,7 +487,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           className="cursor-pointer"
           onClick={handleTimelineClick}
         >
-          <Timeline duration={studioState.duration} currentTime={studioState.currentTime} />
+          <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
         </div>
 
         {/* Waveform Tracks */}
@@ -426,36 +496,36 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
             trackName="vocals"
             color="#3B82F6" // Blue
             waveformData={waveforms.vocals}
-            duration={studioState.duration}
-            currentTime={studioState.currentTime}
-            isMuted={studioState.tracks.vocals.isMuted}
+            duration={audioPlayer.duration}
+            currentTime={audioPlayer.currentTime}
+            isMuted={audioPlayer.trackStates.vocals?.isMuted || false}
             onTrackClick={() => handleTrackMute('vocals')}
           />
           <WaveformTrack
             trackName="drums"
             color="#F97316" // Orange
             waveformData={waveforms.drums}
-            duration={studioState.duration}
-            currentTime={studioState.currentTime}
-            isMuted={studioState.tracks.drums.isMuted}
+            duration={audioPlayer.duration}
+            currentTime={audioPlayer.currentTime}
+            isMuted={audioPlayer.trackStates.drums?.isMuted || false}
             onTrackClick={() => handleTrackMute('drums')}
           />
           <WaveformTrack
             trackName="bass"
             color="#EC4899" // Pink
             waveformData={waveforms.bass}
-            duration={studioState.duration}
-            currentTime={studioState.currentTime}
-            isMuted={studioState.tracks.bass.isMuted}
+            duration={audioPlayer.duration}
+            currentTime={audioPlayer.currentTime}
+            isMuted={audioPlayer.trackStates.bass?.isMuted || false}
             onTrackClick={() => handleTrackMute('bass')}
           />
           <WaveformTrack
             trackName="other"
             color="#10B981" // Green
             waveformData={waveforms.other}
-            duration={studioState.duration}
-            currentTime={studioState.currentTime}
-            isMuted={studioState.tracks.other.isMuted}
+            duration={audioPlayer.duration}
+            currentTime={audioPlayer.currentTime}
+            isMuted={audioPlayer.trackStates.other?.isMuted || false}
             onTrackClick={() => handleTrackMute('other')}
           />
         </div>
