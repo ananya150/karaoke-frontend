@@ -221,7 +221,7 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
                        }} 
                        disabled={isUploading}
                      >
-                       Upload & Process
+                       Process
                      </Button>
                      <Button 
                        variant="outline" 

@@ -12,8 +12,8 @@ export interface HealthResponse {
 }
 
 // Job Status Types
-export type JobStatus = 'queued' | 'processing' | 'completed' | 'completed_with_errors' | 'failed';
-export type ProcessingStep = 'initializing' | 'stem_separation' | 'transcription' | 'beat_analysis' | 'completed';
+export type JobStatus = 'queued' | 'processing' | 'completed' | 'completed_with_errors' | 'failed' | 'skipped';
+export type ProcessingStep = 'validation' | 'stem_separation' | 'transcription' | 'beat_analysis' | 'completed';
 
 export interface ProcessingStageStatus {
   status: JobStatus;
@@ -64,17 +64,14 @@ export interface JobStatusResponse {
   current_step: ProcessingStep;
   created_at: string;
   updated_at: string;
-  estimated_completion?: string;
-  processing_time?: number;
+  processing_time: number;
   error_message?: string | null;
   
-  stem_separation: StemSeparationStatus;
-  transcription: TranscriptionStatus;
-  beat_analysis: BeatAnalysisStatus;
+  stem_separation: StemSeparationStatus | null;
+  transcription: TranscriptionStatus | null;
+  beat_analysis: BeatAnalysisStatus | null;
   
   audio_duration?: number;
-  tempo_bpm?: number;
-  beat_count?: number;
   file_size: number;
 }
 

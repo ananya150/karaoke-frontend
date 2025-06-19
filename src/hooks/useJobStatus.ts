@@ -83,9 +83,6 @@ export function useJobStatus({
       
       if (!isMountedRef.current) return null;
       
-      // Debug log to see the actual response structure
-      console.log('Job Status Response:', response);
-      
       setStatus(response);
       setError(null);
       setRetryCount(0);
@@ -161,51 +158,92 @@ export function useJobStatus({
     }
   }, [onError]);
 
+    // Use refs to avoid stale closures in polling
+  const isPollingRef = useRef(false);
+  const retryCountRef = useRef(0);
+
+  // Update refs when state changes
+  useEffect(() => {
+    isPollingRef.current = isPolling;
+  }, [isPolling]);
+
+  useEffect(() => {
+    retryCountRef.current = retryCount;
+  }, [retryCount]);
+
   // Single poll iteration
   const pollOnce = useCallback(async () => {
-    if (!isPolling || !isMountedRef.current) return;
+    console.log('🔄 POLL: Starting poll iteration, isPolling:', isPollingRef.current, 'isMounted:', isMountedRef.current);
+    
+    if (!isPollingRef.current || !isMountedRef.current) {
+      console.log('❌ POLL: Skipping poll - not polling or not mounted');
+      return;
+    }
     
     try {
+      console.log('📡 POLL: Fetching job status...');
       const response = await fetchStatus();
       
-      if (!response || !isMountedRef.current) return;
+      if (!response || !isMountedRef.current || !isPollingRef.current) {
+        console.log('❌ POLL: No response, not mounted, or polling stopped');
+        return;
+      }
       
-             // Check if job is complete
-       if (response.status === 'completed' || response.status === 'completed_with_errors') {
-         setIsPolling(false);
-         await handleCompletion();
-         return;
-       }
+      console.log('📊 POLL: Got response:', {
+        status: response.status,
+        progress: response.progress,
+        current_step: response.current_step
+      });
+      
+      // Check if job is complete (case-insensitive)
+      const statusLower = response.status.toLowerCase();
+      if (statusLower === 'completed' || statusLower === 'completed_with_errors') {
+        console.log('✅ POLL: Job complete, stopping polling and redirecting');
+        setIsPolling(false);
+        isPollingRef.current = false; // Set ref immediately
+        await handleCompletion();
+        return;
+      }
       
       // Check if job failed
-      if (response.status === 'failed') {
+      if (statusLower === 'failed') {
+        console.log('❌ POLL: Job failed, stopping polling');
         setIsPolling(false);
+        isPollingRef.current = false; // Set ref immediately
         handleFailure(response);
         return;
       }
       
-      // Continue polling for processing/queued status
-      if (response.status === 'processing' || response.status === 'queued') {
+      // Continue polling for processing/queued status (case-insensitive)
+      if (statusLower === 'processing' || statusLower === 'queued') {
+        console.log(`🔄 POLL: Job still ${response.status}, scheduling next poll in ${pollInterval}ms`);
         // Schedule next poll
-        if (isMountedRef.current && isPolling) {
+        if (isMountedRef.current && isPollingRef.current) {
           pollIntervalRef.current = setTimeout(pollOnce, pollInterval);
         }
+      } else {
+        console.log('⚠️ POLL: Unknown status, not scheduling next poll:', response.status);
       }
       
     } catch (err) {
       // Handle polling errors with retry logic
-      if (retryCount < maxRetries) {
-        console.warn(`Polling failed (attempt ${retryCount + 1}/${maxRetries}):`, err);
+      const currentRetryCount = retryCountRef.current;
+      if (currentRetryCount < maxRetries) {
+        console.warn(`Polling failed (attempt ${currentRetryCount + 1}/${maxRetries}):`, err);
+        
+        // Increment retry count
+        setRetryCount(prev => prev + 1);
         
         // Retry with exponential backoff
-        const retryDelay = Math.min(pollInterval * Math.pow(2, retryCount), 30000);
+        const retryDelay = Math.min(pollInterval * Math.pow(2, currentRetryCount), 30000);
         
-        if (isMountedRef.current && isPolling) {
+        if (isMountedRef.current && isPollingRef.current) {
           pollIntervalRef.current = setTimeout(pollOnce, retryDelay);
         }
       } else {
         // Max retries reached
         setIsPolling(false);
+        isPollingRef.current = false; // Set ref immediately
         
         const errorMessage = err instanceof Error ? err.message : 'Polling failed after maximum retries';
         setError(errorMessage);
@@ -216,30 +254,38 @@ export function useJobStatus({
       }
     }
   }, [
-    isPolling, 
     fetchStatus, 
     handleCompletion, 
     handleFailure, 
-    retryCount, 
     maxRetries, 
     pollInterval
   ]);
 
   // Start polling
   const startPolling = useCallback(() => {
-    if (isPolling) return;
+    console.log('🚀 POLL: Starting polling, current isPolling:', isPollingRef.current);
     
+    if (isPollingRef.current) {
+      console.log('⚠️ POLL: Already polling, skipping start');
+      return;
+    }
+    
+    console.log('✅ POLL: Setting up polling');
     setIsPolling(true);
+    isPollingRef.current = true; // Set ref immediately for synchronous access
     setError(null);
     setRetryCount(0);
+    retryCountRef.current = 0; // Set ref immediately for synchronous access
     
     // Start first poll immediately
+    console.log('🔄 POLL: Triggering first poll');
     pollOnce();
-  }, [isPolling, pollOnce]);
+  }, [pollOnce]);
 
   // Stop polling
   const stopPolling = useCallback(() => {
     setIsPolling(false);
+    isPollingRef.current = false; // Set ref immediately for synchronous access
     
     if (pollIntervalRef.current) {
       clearTimeout(pollIntervalRef.current);
@@ -274,14 +320,20 @@ export function useJobStatus({
         
         if (!mounted || !response) return;
         
-                 // Start polling if job is not complete
-         if (response.status === 'processing' || response.status === 'queued') {
-           startPolling();
-         } else if (response.status === 'completed' || response.status === 'completed_with_errors') {
-           await handleCompletion();
-         } else if (response.status === 'failed') {
-           handleFailure(response);
-         }
+                         // Start polling if job is not complete (case-insensitive)
+        console.log('🔍 INIT: Initial status check, deciding next action for status:', response.status);
+        
+        const statusLower = response.status.toLowerCase();
+        if (statusLower === 'processing' || statusLower === 'queued') {
+          console.log('🔄 INIT: Job is processing/queued, starting polling');
+          startPolling();
+        } else if (statusLower === 'completed' || statusLower === 'completed_with_errors') {
+          console.log('✅ INIT: Job already complete, redirecting immediately');
+          await handleCompletion();
+        } else if (statusLower === 'failed') {
+          console.log('❌ INIT: Job failed, handling failure');
+          handleFailure(response);
+        }
         
       } catch (err) {
         console.error('Failed to initialize job status:', err);

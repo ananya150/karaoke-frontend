@@ -144,6 +144,57 @@ export function ProcessingStatus({
   onClearError,
   className,
 }: ProcessingStatusProps) {
+  // Helper function to get stage status directly from backend response
+  const getStageInfo = (stage: string): { status: 'pending' | 'processing' | 'completed' | 'failed', progress: number } => {
+    if (!status) return { status: 'pending', progress: 0 };
+    
+    // Based on the backend guide, each task has its own status and progress
+    let taskData;
+    
+    switch (stage) {
+      case 'stem_separation':
+        taskData = status.stem_separation;
+        break;
+      case 'transcription':
+        taskData = status.transcription;
+        break;
+      case 'beat_analysis':
+        taskData = status.beat_analysis;
+        break;
+      default:
+        return { status: 'pending', progress: 0 };
+    }
+    
+    // Handle case where task data is null (not yet initialized)
+    if (!taskData) {
+      return { status: 'pending', progress: 0 };
+    }
+    
+    // Map backend status to UI status
+    const taskStatus = taskData.status;
+    let uiStatus: 'pending' | 'processing' | 'completed' | 'failed' = 'pending';
+    
+    switch (taskStatus) {
+      case 'queued':
+        uiStatus = 'pending';
+        break;
+      case 'processing':
+        uiStatus = 'processing';
+        break;
+      case 'completed':
+      case 'skipped':
+        uiStatus = 'completed';
+        break;
+      case 'failed':
+        uiStatus = 'failed';
+        break;
+    }
+    
+    return { 
+      status: uiStatus, 
+      progress: taskData.progress || 0
+    };
+  };
   if (isLoading) {
     return (
       <div className={className}>
@@ -210,7 +261,8 @@ export function ProcessingStatus({
   }
 
   const getOverallStatusBadge = () => {
-    switch (status.status) {
+    const statusLower = status.status.toLowerCase();
+    switch (statusLower) {
       case 'queued':
         return <Badge variant="secondary">Queued</Badge>;
       case 'processing':
@@ -292,7 +344,7 @@ export function ProcessingStatus({
               <div className="text-center">
                 <p className="text-sm text-gray-500">Tempo</p>
                 <p className="font-semibold">
-                  {status.tempo_bpm ? `${status.tempo_bpm.toFixed(1)} BPM` : 'Analyzing...'}
+                  {status.beat_analysis?.tempo_bpm ? `${status.beat_analysis.tempo_bpm.toFixed(1)} BPM` : 'Analyzing...'}
                 </p>
               </div>
             </div>
@@ -305,86 +357,73 @@ export function ProcessingStatus({
             <CardTitle className="text-lg">Processing Stages</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-                         {/* Stem Separation */}
+                                      {/* Stem Separation */}
              <ProcessingStage
                title="Audio Separation"
                icon={<Volume2 className="h-6 w-6" />}
-               status={
-                 status.stem_separation?.status === 'completed' ? 'completed' :
-                 status.stem_separation?.status === 'processing' ? 'processing' :
-                 status.stem_separation?.error ? 'failed' : 'pending'
-               }
-               progress={status.stem_separation?.progress || 0}
-               processingTime={status.stem_separation?.processing_time}
-               error={status.stem_separation?.error}
-                             details={
-                 status.stem_separation?.status === 'completed' ? (
+               status={getStageInfo('stem_separation').status}
+               progress={getStageInfo('stem_separation').progress}
+               processingTime={null}
+               error={null}
+               details={
+                 getStageInfo('stem_separation').status === 'completed' ? (
                    <div className="space-y-1">
                      <p>✓ Vocals track extracted</p>
                      <p>✓ Drums track extracted</p>
                      <p>✓ Bass track extracted</p>
                      <p>✓ Other instruments extracted</p>
                    </div>
-                 ) : status.stem_separation?.status === 'processing' ? (
+                 ) : getStageInfo('stem_separation').status === 'processing' ? (
                    <p>Separating audio into individual instrument tracks...</p>
                  ) : null
                }
-            />
+             />
 
             <Separator />
 
-                         {/* Transcription */}
+                                      {/* Transcription */}
              <ProcessingStage
                title="Vocal Transcription"
                icon={<Mic className="h-6 w-6" />}
-               status={
-                 status.transcription?.status === 'completed' ? 'completed' :
-                 status.transcription?.status === 'processing' ? 'processing' :
-                 status.transcription?.error ? 'failed' : 'pending'
-               }
-               progress={status.transcription?.progress || 0}
-               processingTime={status.transcription?.processing_time}
-               error={status.transcription?.error}
+               status={getStageInfo('transcription').status}
+               progress={getStageInfo('transcription').progress}
+               processingTime={null}
+               error={null}
                details={
-                 status.transcription?.status === 'completed' ? (
+                 getStageInfo('transcription').status === 'completed' ? (
                    <div className="space-y-1">
-                     <p>✓ Language: {status.transcription?.language || 'Unknown'}</p>
-                     <p>✓ Words transcribed: {status.transcription?.word_count || 0}</p>
+                     <p>✓ Language detected</p>
+                     <p>✓ Vocals transcribed</p>
                      <p>✓ Timestamps generated</p>
                    </div>
-                 ) : status.transcription?.status === 'processing' ? (
+                 ) : getStageInfo('transcription').status === 'processing' ? (
                    <p>Converting vocals to text with timestamps...</p>
                  ) : null
                }
-            />
+             />
 
-            <Separator />
+             <Separator />
 
-                         {/* Beat Analysis */}
+             {/* Beat Analysis */}
              <ProcessingStage
                title="Beat Analysis"
                icon={<Disc className="h-6 w-6" />}
-               status={
-                 status.beat_analysis?.status === 'completed' ? 'completed' :
-                 status.beat_analysis?.status === 'processing' ? 'processing' :
-                 status.beat_analysis?.error ? 'failed' : 'pending'
-               }
-               progress={status.beat_analysis?.progress || 0}
-               processingTime={status.beat_analysis?.processing_time}
-               error={status.beat_analysis?.error}
+               status={getStageInfo('beat_analysis').status}
+               progress={getStageInfo('beat_analysis').progress}
+               processingTime={null}
+               error={null}
                details={
-                 status.beat_analysis?.status === 'completed' ? (
+                 getStageInfo('beat_analysis').status === 'completed' ? (
                    <div className="space-y-1">
-                     <p>✓ Tempo: {status.beat_analysis?.tempo_bpm?.toFixed(1)} BPM</p>
-                     <p>✓ Time signature: {status.beat_analysis?.time_signature}</p>
-                     <p>✓ Beat confidence: {((status.beat_analysis?.beat_confidence || 0) * 100).toFixed(1)}%</p>
-                     <p>✓ Rhythm regularity: {((status.beat_analysis?.rhythm_regularity || 0) * 100).toFixed(1)}%</p>
+                     <p>✓ Tempo: {status.beat_analysis?.tempo_bpm?.toFixed(1) || 'N/A'} BPM</p>
+                     <p>✓ Beat patterns analyzed</p>
+                     <p>✓ Rhythm structure detected</p>
                    </div>
-                 ) : status.beat_analysis?.status === 'processing' ? (
+                 ) : getStageInfo('beat_analysis').status === 'processing' ? (
                    <p>Analyzing tempo, beats, and rhythm patterns...</p>
                  ) : null
                }
-            />
+             />
           </CardContent>
         </Card>
 
@@ -412,7 +451,7 @@ export function ProcessingStatus({
         )}
 
         {/* Completion Message */}
-        {status.status === 'completed' && (
+        {status.status.toLowerCase() === 'completed' && (
           <Card className="w-full max-w-4xl mx-auto border-green-200">
             <CardContent className="p-6 text-center">
               <div className="space-y-4">
