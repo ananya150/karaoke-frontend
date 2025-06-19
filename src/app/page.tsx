@@ -1,102 +1,114 @@
-import Image from "next/image";
+import { FileUpload } from '@/components/FileUpload';
+import { Music } from 'lucide-react';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Header */}
+      <header className="pt-16 pb-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex justify-center items-center mb-4">
+            <div className="bg-blue-600 p-3 rounded-full">
+              <Music className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            Karaoke Studio
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Transform your audio files into separate instrument tracks. 
+            Upload any song and get vocals, drums, bass, and other instruments as individual tracks.
+          </p>
         </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 pb-16">
+        <FileUpload className="mb-12" />
+
+        {/* Features Section */}
+        <section className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div className="space-y-3">
+              <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
+                <Music className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">AI-Powered Separation</h3>
+              <p className="text-gray-600 text-sm">
+                Advanced machine learning separates your audio into clean, isolated tracks
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">Multiple Formats</h3>
+              <p className="text-gray-600 text-sm">
+                Support for MP3, WAV, M4A, and FLAC files up to 100MB
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
+                <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">Studio Controls</h3>
+              <p className="text-gray-600 text-sm">
+                Professional audio controls with individual track mixing capabilities
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* How it Works */}
+        <section className="max-w-3xl mx-auto mt-16">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">How It Works</h2>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                1
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">Upload Your Audio</h4>
+                <p className="text-gray-600 text-sm">Choose any audio file from your device</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                2
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">AI Processing</h4>
+                <p className="text-gray-600 text-sm">Our AI separates vocals, drums, bass, and other instruments</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                3
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">Studio Playback</h4>
+                <p className="text-gray-600 text-sm">Mix and control each track individually in our audio studio</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500 text-sm">
+            Transform your music with AI-powered audio separation
+          </p>
+        </div>
       </footer>
     </div>
   );
