@@ -7,7 +7,11 @@ import {
   Music,
   Home,
   Loader2,
-  ChevronDown
+  ChevronDown,
+  MicVocal,
+  KeyboardMusic,
+  Guitar,
+  Drum
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -147,7 +151,7 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
       
       {/* Current time cursor */}
       <div 
-        className="absolute top-2 w-[3px] h-[215px] rounded-full bg-white shadow-lg transition-all duration-100"
+        className="absolute top-2 w-[3px] h-[210px] rounded-full bg-white shadow-lg transition-all duration-100"
         style={{ left: `${1 + (currentTime / safeDuration) * (100)}%` }}
       >
       </div>
@@ -485,35 +489,18 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               <Button className='bg-[#393939] hover:bg-[#393939]/80 w-8 h-8'>
                 <ChevronDown className="h-4 w-4" />
               </Button>
-              {/* <div className="absolute bottom-full right-0 mb-2 bg-gray-700 rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="space-y-1 text-xs whitespace-nowrap">
-                  {Object.entries(results.download_links).map(([type, url]) => {
-                    if (type.includes('stem') && url) {
-                      const trackName = type.replace('_stem', '');
-                      return (
-                        <a
-                          key={type}
-                          href={getDownloadUrl(url.split('/').pop() || '')}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block hover:text-blue-400"
-                        >
-                          {trackName} track
-                        </a>
-                      );
-                    }
-                    return null;
-                  }).filter(Boolean)}
-                </div>
-              </div> */}
             </div>
           </div>
         </div>
 
         <div className='h-[230px] bg-black w-full flex'>
           {/* Sidebar */}
-          <div className='w-[55px] bg-[#1A1B1D]'>
-
+          <div className='w-[55px] bg-[#1A1B1D] pt-[45px] pb-[20px] flex flex-col items-center justify-between'>
+            <MicVocal  className='h-5 w-5 text-[#3E84E8]' />
+            <KeyboardMusic  className='h-5 w-5 text-[#C19549]' />
+            <Guitar className='h-5 w-5 text-[#FC66F0]' />
+            <Drum className='h-5 w-5 text-[#9DF8D6]' />
+              
           </div>
           <div className='w-[calc(100%-55px)] flex flex-col'>
             {/* Timeline */}
