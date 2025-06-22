@@ -4,15 +4,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, 
   Pause, 
-  Volume2,
-  VolumeX,
   Music,
-  Download,
   Home,
-  Loader2
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import { api } from '@/lib/api';
 import { JobResultsResponse } from '@/types/api';
 import { toast } from 'sonner';
@@ -157,6 +155,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
+  
+  // Volume states for vocals and instruments (non-vocal tracks combined)
+  const [vocalsVolume, setVocalsVolume] = useState([70]);
+  const [instrumentsVolume, setInstrumentsVolume] = useState([70]);
 
   // Mock waveform data
   const [waveforms] = useState({
@@ -330,15 +332,9 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     }
   };
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getDownloadUrl = (filename: string): string => {
-    return api.getFileDownloadURL(jobId, filename);
-  };
+  // const getDownloadUrl = (filename: string): string => {
+  //   return api.getFileDownloadURL(jobId, filename);
+  // };
 
   if (isLoading || !minLoadingComplete) {
     return (
@@ -377,7 +373,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   return (
     <div className="h-screen bg-black text-white flex flex-col">
       {/* Header */}
-      <div className="h-16 bg-gray-900 border-b border-gray-700 flex items-center justify-between px-6">
+      {/* <div className="h-16 bg-gray-900 border-b border-gray-700 flex items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           <div className="bg-blue-600 p-2 rounded">
             <Music className="h-5 w-5 text-white" />
@@ -404,7 +400,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
             </Button>
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
@@ -412,7 +408,6 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
         <div className="flex-1 bg-black flex items-center justify-center p-8">
           <div className="text-center max-w-4xl">
             <div className="text-6xl font-bold text-white mb-8 leading-tight">
-              {/* This would be populated with actual lyrics/transcription */}
                              <div className="mb-4 opacity-60">It&apos;s the music</div>
                <div className="mb-4 opacity-60">that we choose</div>
                <div className="mb-8">The world is</div>
@@ -424,40 +419,68 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
         </div>
 
         {/* Controls Bar */}
-        <div className="h-16 bg-gray-800 border-t border-gray-700 flex items-center justify-between px-6">
+        <div className="h-14 bg-[#2A2828] border-t border-gray-700 flex items-center justify-between px-2">
           <div className="flex items-center space-x-4">
             <Button
               onClick={handlePlayPause}
               size="sm"
-              className="w-10 h-10 rounded-full bg-white text-black hover:bg-gray-200"
+              className="w-6.5 h-6.5 rounded-full bg-white text-black hover:bg-gray-200"
               disabled={audioPlayer.isLoading}
             >
               {audioPlayer.isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4.5 w-4.5 animate-spin" />
               ) : audioPlayer.isPlaying ? (
-                <Pause className="h-4 w-4" />
+                <Pause fill='#000' className="h-2 w-2" />
               ) : (
-                <Play className="h-4 w-4" />
+                <Play fill='#000' className="h-2 w-2" />
               )}
             </Button>
             
-            <div className="text-white text-sm font-mono">
+            <div className="text-white text-sm font-satoshi font-bold">
               {audioPlayer.formatTime(audioPlayer.currentTime)}
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-400">vocals</span>
-            <Volume2 className="h-4 w-4 text-gray-400" />
-            <span className="text-sm text-gray-400">instruments</span>
-            <VolumeX className="h-4 w-4 text-gray-400" />
+          <div className="flex items-center space-x-10">
+            {/* Vocals Volume Control */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">vocals</span>
+              <Slider
+                value={vocalsVolume}
+                onValueChange={(value) => {
+                  setVocalsVolume(value);
+                  audioPlayer.setTrackVolume('vocals', value[0] / 100);
+                }}
+                max={100}
+                step={1}
+                className="w-20"
+              />
+            </div>
+            
+            {/* Instruments Volume Control */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">instruments</span>
+              <Slider
+                value={instrumentsVolume}
+                onValueChange={(value) => {
+                  setInstrumentsVolume(value);
+                  // Set volume for all non-vocal tracks
+                  audioPlayer.setTrackVolume('drums', value[0] / 100);
+                  audioPlayer.setTrackVolume('bass', value[0] / 100);
+                  audioPlayer.setTrackVolume('other', value[0] / 100);
+                }}
+                max={100}
+                step={1}
+                className="w-20"
+              />
+            </div>
             
             {/* Download button */}
             <div className="relative group">
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4" />
+              <Button className='bg-[#393939] hover:bg-[#393939]/80 w-8 h-8'>
+                <ChevronDown className="h-4 w-4" />
               </Button>
-              <div className="absolute bottom-full right-0 mb-2 bg-gray-700 rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* <div className="absolute bottom-full right-0 mb-2 bg-gray-700 rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="space-y-1 text-xs whitespace-nowrap">
                   {Object.entries(results.download_links).map(([type, url]) => {
                     if (type.includes('stem') && url) {
@@ -477,7 +500,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
                     return null;
                   }).filter(Boolean)}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
