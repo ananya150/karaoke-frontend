@@ -1,115 +1,53 @@
 import { FileUpload } from '@/components/FileUpload';
 import { Music } from 'lucide-react';
+import { HighlightText } from "@/components/ui/text/highlight";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
+      {/* Checkered Background Pattern */}
+      <div 
+        className="fixed inset-0 opacity-2 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(45deg, #000 25%, transparent 25%), 
+            linear-gradient(-45deg, #000 25%, transparent 25%), 
+            linear-gradient(45deg, transparent 75%, #000 75%), 
+            linear-gradient(-45deg, transparent 75%, #000 75%)
+          `,
+          backgroundSize: '40px 40px',
+          backgroundPosition: '0 0, 0 20px, 20px -20px, -20px 0px'
+        }}
+      />
       {/* Header */}
-      <header className="pt-16 pb-8">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex justify-center items-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <Music className="h-8 w-8 text-white" />
+      <header className="w-full py-6 px-8">
+        <div className="flex justify-center">
+          <nav className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 shadow-lg">
+            <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-2">
+                <div className=" w-[25px] h-[25px] sm:w-[30px] sm:h-[30px] md:w-[35px] md:h-[35px] lg:w-[35px] lg:h-[35px] flex flex-col justify-center items-center rounded-[100px]">
+                  <Music className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 text-[#FD5F57] " />
+                </div>
+              </div>
+              <a href="#" className="text-gray-900 font-satoshi font-bold hover:text-[#FD5F57] transition-colors">Home</a>
+              <a href="#" className="text-gray-900 font-satoshi font-bold hover:text-[#FD5F57] transition-colors">Contact</a>
             </div>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Karaoke Studio
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Transform your audio files into separate instrument tracks. 
-            Upload any song and get vocals, drums, bass, and other instruments as individual tracks.
-          </p>
+          </nav>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 pb-16">
-        <FileUpload className="mb-12" />
-
-        {/* Features Section */}
-        <section className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="space-y-3">
-              <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
-                <Music className="h-6 w-6 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">AI-Powered Separation</h3>
-              <p className="text-gray-600 text-sm">
-                Advanced machine learning separates your audio into clean, isolated tracks
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
-                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">Multiple Formats</h3>
-              <p className="text-gray-600 text-sm">
-                Support for MP3, WAV, M4A, and FLAC files up to 100MB
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto">
-                <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">Studio Controls</h3>
-              <p className="text-gray-600 text-sm">
-                Professional audio controls with individual track mixing capabilities
-              </p>
-            </div>
+      {/* Main Content - Centered */}
+      <main className="flex-1 flex flex-col items-center justify-center px-8">
+          {/* Hero Section */}
+          <div className="text-center mb-20 -mt-20">
+            <span className="text-3xl sm:text-4xl md:text-6xl xl:text-7xl font-black font-satoshi tracking-tight">Feel like a <HighlightText className="bg-gradient-to-r from-[#FD5F57] to-yellow-200" text="Music Composer" inView /> </span>
           </div>
-        </section>
 
-        {/* How it Works */}
-        <section className="max-w-3xl mx-auto mt-16">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">How It Works</h2>
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                1
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Upload Your Audio</h4>
-                <p className="text-gray-600 text-sm">Choose any audio file from your device</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                2
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">AI Processing</h4>
-                <p className="text-gray-600 text-sm">Our AI separates vocals, drums, bass, and other instruments</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                3
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">Studio Playback</h4>
-                <p className="text-gray-600 text-sm">Mix and control each track individually in our audio studio</p>
-              </div>
-            </div>
+          {/* Upload Section */}
+          <div className="w-full max-w-2xl mx-auto">
+            <FileUpload />
           </div>
-        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-500 text-sm">
-            Transform your music with AI-powered audio separation
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

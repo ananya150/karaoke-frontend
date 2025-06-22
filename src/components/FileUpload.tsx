@@ -2,15 +2,14 @@
 
 import React, { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, Music, AlertCircle, CheckCircle, X } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Music, AlertCircle, FileSearch, X, Loader } from 'lucide-react';
+import { MagneticButton } from '@/components/ui/buttons/magnetic';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { api, formatFileSize } from '@/lib/api';
 import { ApiError, NetworkError, ValidationError } from '@/types/api';
 import { toast } from 'sonner';
+import { parseBlob } from 'music-metadata';
+
 
 interface FileUploadProps {
   onUploadSuccess?: (jobId: string) => void;
@@ -25,11 +24,10 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [ , setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
-  // Supported file types for display
-  const supportedFormats = ['MP3', 'WAV', 'M4A', 'FLAC'];
   const maxFileSize = 100 * 1024 * 1024; // 100MB
 
   // File validation
@@ -58,6 +56,25 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
     return null;
   }, [maxFileSize]);
 
+  // Extract cover art from audio file
+  const extractCoverArt = useCallback(async (file: File) => {
+    try {
+      const metadata = await parseBlob(file);
+      const picture = metadata.common.picture?.[0];
+      
+      if (picture) {
+        const blob = new Blob([picture.data], { type: picture.format });
+        const imageUrl = URL.createObjectURL(blob);
+        setCoverImageUrl(imageUrl);
+      } else {
+        setCoverImageUrl(null);
+      }
+    } catch (error) {
+      console.error('Error extracting cover art:', error);
+      setCoverImageUrl(null);
+    }
+  }, []);
+
   // Handle file selection
   const handleFileSelect = useCallback((file: File) => {
     const validationError = validateFile(file);
@@ -65,12 +82,14 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
     if (validationError) {
       setError(validationError);
       setSelectedFile(null);
+      setCoverImageUrl(null);
       return;
     }
 
     setError(null);
     setSelectedFile(file);
-  }, [validateFile]);
+    extractCoverArt(file);
+  }, [validateFile, extractCoverArt]);
 
   // Handle drag events
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -151,6 +170,7 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
     setSelectedFile(null);
     setError(null);
     setUploadProgress(0);
+    setCoverImageUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -163,129 +183,129 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
 
   return (
     <div className={className}>
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardContent className="p-8">
-          {/* Upload Area */}
+      <div className="w-[250px] h-[325px] mx-auto">
+        {/* Outer Container */}
+        <div className="bg-white/90 h-[325px] backdrop-blur-sm border border-gray-200 shadow-lg rounded-[50px]">
+          {/* Upload Area - Inner dashed container */}
           <div
             className={`
-              relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200
-              ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
-              ${isUploading ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              relative border-2 border-dashed rounded-[25px] w-[200px] h-[200px] mt-[25px] ml-[25px] p-8 text-center transition-all duration-300 mb-8
+              ${isDragOver ? 'border-gray-300 bg-gray-600' : 'border-gray/50 hover:border-gray-300'}
+              ${isUploading ? 'pointer-events-none opacity-60' : 'cursor-pointer'}
+              bg-transparent
             `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={openFileDialog}
+            onClick={selectedFile ? undefined : openFileDialog}
           >
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".mp3,.wav,.m4a,.flac,audio/*"
-              onChange={handleInputChange}
-              className="hidden"
-              disabled={isUploading}
-            />
+            {/* Clear button - Top right corner */}
+            {selectedFile && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  clearSelection();
+                }}
+                className="absolute top-3 right-3 bg-gray-200 hover:bg-gray-300 rounded-full p-1 transition-colors z-10"
+                disabled={isUploading}
+              >
+                <X className="h-4 w-4 text-gray-600" />
+              </button>
+            )}
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".mp3,.wav,.m4a,.flac,audio/*"
+            onChange={handleInputChange}
+            className="hidden"
+            disabled={isUploading}
+          />
 
-            {/* Upload Icon and Text */}
-            <div className="space-y-4">
+            {/* Upload Content */}
+            <div className="space-y-4 w-full h-full">
               {isUploading ? (
-                <div className="space-y-4">
-                  <div className="flex justify-center">
-                    <Music className="h-12 w-12 text-blue-500 animate-pulse" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-900">Uploading...</p>
-                    <p className="text-sm text-gray-500">Please wait while we upload your file</p>
-                  </div>
-                  <div className="max-w-xs mx-auto">
-                    <Progress value={uploadProgress} className="h-2" />
-                    <p className="text-xs text-gray-500 mt-1">{uploadProgress}% complete</p>
-                  </div>
+                <div className="w-full h-full flex justify-center items-center ">
+                  <Loader className='animate-spin w-4 h-4' />
                 </div>
               ) : selectedFile ? (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-4">
                   <div className="flex justify-center">
-                    <CheckCircle className="h-12 w-12 text-green-500" />
+                    {coverImageUrl ? (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden shadow-lg">
+                        <img 
+                          src={coverImageUrl} 
+                          alt="Album cover" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center">
+                        <Music className="h-8 w-8 text-gray-400" />
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-900">File Selected</p>
-                    <p className="text-sm text-gray-700 font-medium">{selectedFile.name}</p>
-                    <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
-                  </div>
-                                     <div className="flex justify-center space-x-2">
-                     <Button 
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         handleUpload();
-                       }} 
-                       disabled={isUploading}
-                     >
-                       Process
-                     </Button>
-                     <Button 
-                       variant="outline" 
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         clearSelection();
-                       }} 
-                       disabled={isUploading}
-                     >
-                       <X className="h-4 w-4 mr-1" />
-                       Clear
-                     </Button>
-                   </div>
+                                      <div>
+                      <p className="text-gray-700 font-medium text-sm">{selectedFile.name}</p>
+                      <p className="text-gray-500 text-xs">{formatFileSize(selectedFile.size)}</p>
+                    </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div className="flex justify-center">
-                    <Upload className="h-12 w-12 text-gray-400" />
+                    <div className="p-4 rounded-full">
+                      <FileSearch className="h-12 w-12 text-black" />
+                    </div>
                   </div>
                   <div>
-                    <p className="text-lg font-medium text-gray-900">
-                      Drop your audio file here
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      or <span className="text-blue-600 font-medium">browse</span> to select
-                    </p>
+                    <h3 className="text-[16px]  font-satoshi font-medium ">
+                      drop a music file
+                    </h3>
                   </div>
-                  <Button variant="outline" onClick={openFileDialog}>
-                    Choose File
-                  </Button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Error Display */}
-          {error && (
-            <Alert className="mt-4" variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* File Requirements */}
-          <div className="mt-6 space-y-3">
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Supported Formats:</p>
-              <div className="flex flex-wrap gap-2">
-                {supportedFormats.map((format) => (
-                  <Badge key={format} variant="secondary" className="text-xs">
-                    {format}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            
-            <div className="text-xs text-gray-500 space-y-1">
-              <p>• Maximum file size: 100MB</p>
-              <p>• Processing time: 2-5 minutes depending on file length</p>
-              <p>• Your file will be processed into separate audio tracks</p>
-            </div>
+          {/* Browse/Proceed Button - Outside the dashed area */}
+          <div className="flex justify-center">
+            {selectedFile ? (
+              <MagneticButton 
+                className='w-[200px] rounded-full bg-[#FD5F57] hover:bg-[#FD5F57]/80'
+                onClick={isUploading ? undefined : handleUpload}
+              >
+                {isUploading ? 'Processing...' : 'Proceed'}
+              </MagneticButton>
+            ) : (
+              <MagneticButton 
+                className='w-[200px] rounded-full'
+                onClick={openFileDialog}
+                disabled={isUploading}
+              >
+                Browse
+              </MagneticButton>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <Alert className="mt-6 border-red-200 bg-red-50" variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-red-800">{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Supported formats */}
+        {/* <div className="mt-4 text-center">
+          <div className="flex justify-center space-x-3 text-xs text-gray-400">
+            <span>MP3</span>
+            <span>WAV</span>
+            <span>M4A</span>
+            <span>FLAC</span>
+          </div>
+        </div> */}
+      </div>
     </div>
   );
 } 

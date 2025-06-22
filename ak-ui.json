@@ -1,0 +1,2115 @@
+[
+  {
+    "name": "Button",
+    "category": "buttons",
+    "description": "A versatile button component with multiple variants and sizes.",
+    "cli": "npx @notacoder15/ak-ui-cli add button",
+    "import": "@/components/ui/buttons/button",
+    "export": "Button",
+    "props": {
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "link"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "lg",
+          "icon"
+        ],
+        "default": "default"
+      },
+      "asChild": {
+        "type": "boolean",
+        "default": false
+      }
+    },
+    "example": "<Button variant=\"default\" size=\"default\">Click me</Button>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "CopyButton",
+    "category": "buttons",
+    "description": "A button with copy-to-clipboard functionality and visual feedback animation.",
+    "cli": "npx @notacoder15/ak-ui-cli add copy-button",
+    "import": "@/components/ui/buttons/copy",
+    "export": "CopyButton",
+    "props": {
+      "content": "string",
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "muted"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "md",
+          "lg"
+        ],
+        "default": "default"
+      },
+      "delay": {
+        "type": "number",
+        "default": 3000
+      },
+      "isCopied": {
+        "type": "boolean",
+        "default": false
+      },
+      "onCopy": "function",
+      "onCopyChange": "function"
+    },
+    "example": "<CopyButton content=\"Hello World!\" variant=\"default\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "FlipButton",
+    "category": "buttons",
+    "description": "A button with 3D flip animation effect on hover with customizable directions.",
+    "cli": "npx @notacoder15/ak-ui-cli add flip-button",
+    "import": "@/components/ui/buttons/flip",
+    "export": "FlipButton",
+    "props": {
+      "frontText": "string",
+      "backText": "string",
+      "from": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "top"
+      },
+      "frontClassName": "string",
+      "backClassName": "string"
+    },
+    "example": "<FlipButton frontText=\"Hover Me\" backText=\"Flipped!\" from=\"top\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "GitHubStarsButton",
+    "category": "buttons",
+    "description": "A button that displays real GitHub repository star count with animated counter. Fetches data from GitHub API.",
+    "cli": "npx @notacoder15/ak-ui-cli add github-stars-button",
+    "import": "@/components/ui/buttons/github-stars",
+    "export": "GitHubStarsButton",
+    "dependencies": [
+      "@/components/ui/text/sliding-number"
+    ],
+    "props": {
+      "username": "string",
+      "repo": "string",
+      "formatted": {
+        "type": "boolean",
+        "default": false
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "inViewMargin": "string",
+      "transition": "object"
+    },
+    "example": "<GitHubStarsButton username=\"vercel\" repo=\"next.js\" formatted={true} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "IconButton",
+    "category": "buttons",
+    "description": "A circular button with icons featuring interactive effects and customizable colors.",
+    "cli": "npx @notacoder15/ak-ui-cli add icon-button",
+    "import": "@/components/ui/buttons/icon",
+    "export": "IconButton",
+    "props": {
+      "icon": "React.ElementType",
+      "active": {
+        "type": "boolean",
+        "default": false
+      },
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "md",
+          "lg"
+        ],
+        "default": "default"
+      },
+      "color": {
+        "type": "array",
+        "default": [
+          59,
+          130,
+          246
+        ]
+      }
+    },
+    "example": "<IconButton icon={Heart} active={true} size=\"default\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "InputButton",
+    "category": "buttons",
+    "description": "A compound component that transforms between button and input field with smooth animations.",
+    "cli": "npx @notacoder15/ak-ui-cli add input-button",
+    "import": "@/components/ui/buttons/input",
+    "export": "InputButton, InputButtonProvider, InputButtonAction, InputButtonSubmit, InputButtonInput",
+    "props": {
+      "showInput": {
+        "type": "boolean",
+        "default": false
+      },
+      "placeholder": "string",
+      "icon": "React.ElementType"
+    },
+    "example": "<InputButtonProvider><InputButton><InputButtonAction>Search...</InputButtonAction><InputButtonInput placeholder=\"Type...\" /><InputButtonSubmit>Go</InputButtonSubmit></InputButton></InputButtonProvider>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "LiquidButton",
+    "category": "buttons",
+    "description": "A button with liquid-like fill animation effect on hover.",
+    "cli": "npx @notacoder15/ak-ui-cli add liquid-button",
+    "import": "@/components/ui/buttons/liquid",
+    "export": "LiquidButton",
+    "props": {
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "outline",
+          "secondary"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "lg",
+          "icon"
+        ],
+        "default": "default"
+      }
+    },
+    "example": "<LiquidButton variant=\"default\">Hover Effect</LiquidButton>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "RippleButton",
+    "category": "buttons",
+    "description": "A button with ripple click effect that emanates from the click point.",
+    "cli": "npx @notacoder15/ak-ui-cli add ripple-button",
+    "import": "@/components/ui/buttons/ripple",
+    "export": "RippleButton",
+    "props": {
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "lg",
+          "icon"
+        ],
+        "default": "default"
+      },
+      "scale": {
+        "type": "number",
+        "default": 10
+      },
+      "rippleClassName": "string"
+    },
+    "example": "<RippleButton variant=\"default\">Click for Ripple</RippleButton>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "MagneticButton",
+    "category": "buttons",
+    "description": "A button with magnetic attraction effect that follows mouse movement within range.",
+    "cli": "npx @notacoder15/ak-ui-cli add magnetic-button",
+    "import": "@/components/ui/buttons/magnetic",
+    "export": "MagneticButton",
+    "props": {
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "lg",
+          "icon"
+        ],
+        "default": "default"
+      },
+      "strength": {
+        "type": "number",
+        "default": 0.3
+      },
+      "range": {
+        "type": "number",
+        "default": 100
+      },
+      "onlyOnHover": {
+        "type": "boolean",
+        "default": true
+      },
+      "disableOnTouch": {
+        "type": "boolean",
+        "default": true
+      },
+      "springOptions": "object"
+    },
+    "example": "<MagneticButton strength={0.3} range={100}>Magnetic Effect</MagneticButton>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "LiquidGlassButton",
+    "category": "buttons",
+    "description": "Interactive glass morphism button with backdrop blur and realistic lighting effects.",
+    "cli": "npx @notacoder15/ak-ui-cli add liquid-glass-button",
+    "import": "@/components/ui/buttons/liquid-glass",
+    "export": "LiquidGlassButton, LiquidGlassButtonDemo",
+    "props": {
+      "children": "React.ReactNode",
+      "href": "string",
+      "target": {
+        "type": "string",
+        "default": "_blank"
+      },
+      "onClick": "() => void",
+      "className": "string"
+    },
+    "example": "<LiquidGlassButton href=\"https://example.com\">Glass Button</LiquidGlassButton>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "SlidingNumber",
+    "category": "text",
+    "description": "An animated number component with smooth sliding transitions between values.",
+    "cli": "npx @notacoder15/ak-ui-cli add sliding-number",
+    "import": "@/components/ui/text/sliding-number",
+    "export": "SlidingNumber",
+    "props": {
+      "number": "number | string",
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "padStart": {
+        "type": "boolean",
+        "default": false
+      },
+      "decimalSeparator": {
+        "type": "string",
+        "default": "."
+      },
+      "decimalPlaces": "number",
+      "transition": "object"
+    },
+    "example": "<SlidingNumber number={1234} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "CountingNumber",
+    "category": "text",
+    "description": "Animated number counter with smooth spring transitions and customizable formatting.",
+    "cli": "npx @notacoder15/ak-ui-cli add counting-number",
+    "import": "@/components/ui/text/counting-number",
+    "export": "CountingNumber",
+    "props": {
+      "number": "number",
+      "fromNumber": {
+        "type": "number",
+        "default": 0
+      },
+      "padStart": {
+        "type": "boolean",
+        "default": false
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "decimalSeparator": {
+        "type": "string",
+        "default": "."
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ stiffness: 90, damping: 50 }"
+      },
+      "decimalPlaces": {
+        "type": "number",
+        "default": 0
+      },
+      "className": "string"
+    },
+    "example": "<CountingNumber number={1234} fromNumber={0} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "GradientText",
+    "category": "text",
+    "description": "Animated gradient text with customizable colors and optional neon glow effect.",
+    "cli": "npx @notacoder15/ak-ui-cli add gradient-text",
+    "import": "@/components/ui/text/gradient",
+    "export": "GradientText",
+    "props": {
+      "text": "string",
+      "gradient": {
+        "type": "string",
+        "default": "linear-gradient(90deg, #3b82f6 0%, #a855f7 20%, #ec4899 50%, #a855f7 80%, #3b82f6 100%)"
+      },
+      "neon": {
+        "type": "boolean",
+        "default": false
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ duration: 50, repeat: Infinity, ease: 'linear' }"
+      },
+      "className": "string"
+    },
+    "example": "<GradientText text=\"Beautiful Gradient\" neon />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "HighlightText",
+    "category": "text",
+    "description": "Text with animated highlight background that expands on view.",
+    "cli": "npx @notacoder15/ak-ui-cli add highlight-text",
+    "import": "@/components/ui/text/highlight",
+    "export": "HighlightText",
+    "props": {
+      "text": "string",
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ duration: 2, ease: 'easeInOut' }"
+      },
+      "className": "string"
+    },
+    "example": "<HighlightText text=\"Highlighted Text\" inView />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "RollingText",
+    "category": "text",
+    "description": "3D rolling animation effect with perspective transforms.",
+    "cli": "npx @notacoder15/ak-ui-cli add rolling-text",
+    "import": "@/components/ui/text/rolling",
+    "export": "RollingText",
+    "props": {
+      "text": "string",
+      "transition": {
+        "type": "object",
+        "default": "{ duration: 0.5, delay: 0.1, ease: 'easeOut' }"
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "className": "string"
+    },
+    "example": "<RollingText text=\"Rolling Animation\" inView />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "RotatingText",
+    "category": "text",
+    "description": "Cycles through multiple text options with smooth transitions.",
+    "cli": "npx @notacoder15/ak-ui-cli add rotating-text",
+    "import": "@/components/ui/text/rotating",
+    "export": "RotatingText",
+    "props": {
+      "text": "string | string[]",
+      "duration": {
+        "type": "number",
+        "default": 2000
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ duration: 0.3, ease: 'easeOut' }"
+      },
+      "y": {
+        "type": "number",
+        "default": -50
+      },
+      "containerClassName": "string",
+      "className": "string"
+    },
+    "example": "<RotatingText text={[\"Amazing\", \"Beautiful\", \"Incredible\"]} duration={2000} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "SplittingText",
+    "category": "text",
+    "description": "Text animation that splits by characters, words, or lines with staggered effects.",
+    "cli": "npx @notacoder15/ak-ui-cli add splitting-text",
+    "import": "@/components/ui/text/splitting",
+    "export": "SplittingText",
+    "props": {
+      "text": "string | string[]",
+      "type": {
+        "type": "enum",
+        "values": [
+          "chars",
+          "words",
+          "lines"
+        ],
+        "default": "chars"
+      },
+      "motionVariants": {
+        "type": "object",
+        "default": "{}"
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "delay": {
+        "type": "number",
+        "default": 0
+      },
+      "className": "string"
+    },
+    "example": "<SplittingText text=\"Character Split\" type=\"chars\" inView />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "TypingText",
+    "category": "text",
+    "description": "Typewriter effect with optional cursor and support for multiple text sequences.",
+    "cli": "npx @notacoder15/ak-ui-cli add typing-text",
+    "import": "@/components/ui/text/typing",
+    "export": "TypingText",
+    "props": {
+      "text": "string | string[]",
+      "duration": {
+        "type": "number",
+        "default": 100
+      },
+      "delay": {
+        "type": "number",
+        "default": 0
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "cursor": {
+        "type": "boolean",
+        "default": false
+      },
+      "loop": {
+        "type": "boolean",
+        "default": false
+      },
+      "holdDelay": {
+        "type": "number",
+        "default": 1000
+      },
+      "cursorClassName": "string",
+      "animateOnChange": {
+        "type": "boolean",
+        "default": true
+      },
+      "className": "string"
+    },
+    "example": "<TypingText text=\"Hello, World!\" cursor duration={100} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "WritingText",
+    "category": "text",
+    "description": "Word-by-word animation with spring transitions and customizable spacing.",
+    "cli": "npx @notacoder15/ak-ui-cli add writing-text",
+    "import": "@/components/ui/text/writing",
+    "export": "WritingText",
+    "props": {
+      "text": "string",
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', bounce: 0, duration: 2, delay: 0.5 }"
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": {
+        "type": "string",
+        "default": "0px"
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "spacing": {
+        "type": "number | string",
+        "default": 5
+      },
+      "className": "string"
+    },
+    "example": "<WritingText text=\"Beautiful writing animation\" inView />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "AvatarGroup",
+    "category": "custom",
+    "description": "Display a collection of avatars in an overlapping group layout with hover animations and tooltips.",
+    "cli": "npx @notacoder15/ak-ui-cli add avatar-group",
+    "import": "@/components/ui/custom/avatar-group",
+    "export": "AvatarGroup, AvatarGroupTooltip",
+    "dependencies": [
+      "@/components/ui/tooltip/tooltip"
+    ],
+    "props": {
+      "children": "React.ReactElement[]",
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 300, damping: 17 }"
+      },
+      "invertOverlap": {
+        "type": "boolean",
+        "default": false
+      },
+      "translate": {
+        "type": "string | number",
+        "default": "'-30%'"
+      },
+      "tooltipProps": {
+        "type": "object",
+        "default": "{ side: 'top', sideOffset: 24 }"
+      },
+      "className": "string"
+    },
+    "example": "<AvatarGroup><div><Avatar src=\"...\" alt=\"User\" /><AvatarGroupTooltip>John Doe</AvatarGroupTooltip></div></AvatarGroup>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "CodeEditor",
+    "category": "custom",
+    "description": "An animated code editor with syntax highlighting, typing animation, and copy functionality.",
+    "cli": "npx @notacoder15/ak-ui-cli add code-editor",
+    "import": "@/components/ui/custom/code-editor",
+    "export": "CodeEditor",
+    "dependencies": [
+      "@/components/ui/buttons/copy"
+    ],
+    "props": {
+      "children": "string",
+      "lang": "string",
+      "themes": {
+        "type": "object",
+        "default": "{ light: 'github-light', dark: 'github-dark' }"
+      },
+      "duration": {
+        "type": "number",
+        "default": 5
+      },
+      "delay": {
+        "type": "number",
+        "default": 0
+      },
+      "header": {
+        "type": "boolean",
+        "default": true
+      },
+      "dots": {
+        "type": "boolean",
+        "default": true
+      },
+      "icon": "React.ReactNode",
+      "cursor": {
+        "type": "boolean",
+        "default": false
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewMargin": "string",
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "copyButton": {
+        "type": "boolean",
+        "default": false
+      },
+      "writing": {
+        "type": "boolean",
+        "default": true
+      },
+      "title": "string",
+      "onDone": "function",
+      "onCopy": "function",
+      "className": "string"
+    },
+    "example": "<CodeEditor lang=\"tsx\" title=\"component.tsx\" cursor copyButton>{`const Component = () => <div>Hello</div>;`}</CodeEditor>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "ManagementBar",
+    "category": "custom",
+    "description": "An interactive management bar with pagination, action buttons, and smooth animations. Perfect for data management interfaces.",
+    "cli": "npx @notacoder15/ak-ui-cli add management-bar",
+    "import": "@/components/ui/custom/management-bar",
+    "export": "ManagementBar",
+    "dependencies": [
+      "@/components/ui/text/sliding-number"
+    ],
+    "props": {
+      "className": "string"
+    },
+    "example": "<ManagementBar />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "PlayfulTodolist",
+    "category": "custom",
+    "description": "A fun and interactive todo list with animated strikethrough effects using SVG paths and smooth animations.",
+    "cli": "npx @notacoder15/ak-ui-cli add playful-todolist",
+    "import": "@/components/ui/custom/playful-todolist",
+    "export": "PlayfulTodolist",
+    "dependencies": [
+      "@/components/ui/common/checkbox",
+      "@/components/ui/common/label"
+    ],
+    "props": {
+      "className": "string"
+    },
+    "example": "<PlayfulTodolist />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "MotionGrid",
+    "category": "custom",
+    "description": "An animated grid component that cycles through different patterns with smooth transitions. Perfect for loading states or decorative animations.",
+    "cli": "npx @notacoder15/ak-ui-cli add motion-grid",
+    "import": "@/components/ui/custom/motion-grid",
+    "export": "MotionGrid, MotionGridProps, Coordinate, Coordinates",
+    "props": {
+      "gridSize": {
+        "type": "array",
+        "description": "Tuple of [cols, rows] for grid dimensions"
+      },
+      "frames": {
+        "type": "array",
+        "description": "Array of coordinate arrays representing animation frames"
+      },
+      "duration": {
+        "type": "number",
+        "default": 200
+      },
+      "animate": {
+        "type": "boolean",
+        "default": true
+      },
+      "cellClassName": "string",
+      "cellActiveClassName": "string",
+      "cellInactiveClassName": "string",
+      "className": "string"
+    },
+    "example": "<MotionGrid gridSize={[5, 5]} frames={[[[1, 1], [2, 1]], [[1, 2], [2, 2]]]} duration={800} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "PinList",
+    "category": "custom",
+    "description": "An interactive list component where items can be pinned/unpinned with smooth layout animations and proper z-index management.",
+    "cli": "npx @notacoder15/ak-ui-cli add pin-list",
+    "import": "@/components/ui/custom/pin-list",
+    "export": "PinList, PinListProps, PinListItem",
+    "props": {
+      "items": {
+        "type": "array",
+        "description": "Array of PinListItem objects with id, name, info, icon, and pinned properties"
+      },
+      "labels": {
+        "type": "object",
+        "default": "{ pinned: 'Pinned Items', unpinned: 'All Items' }"
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ stiffness: 320, damping: 20, mass: 0.8, type: 'spring' }"
+      },
+      "labelMotionProps": {
+        "type": "object"
+      },
+      "className": "string",
+      "labelClassName": "string",
+      "pinnedSectionClassName": "string",
+      "unpinnedSectionClassName": "string",
+      "zIndexResetDelay": {
+        "type": "number",
+        "default": 500
+      }
+    },
+    "example": "<PinList items={[{id: 1, name: 'Item', info: 'Description', icon: HomeIcon, pinned: false}]} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "ScrollProgress",
+    "category": "custom",
+    "description": "A scroll progress indicator that shows reading progress with smooth spring animations. Works for both window scroll and container scroll.",
+    "cli": "npx @notacoder15/ak-ui-cli add scroll-progress",
+    "import": "@/components/ui/custom/scroll-progress",
+    "export": "ScrollProgress, ScrollProgressProps",
+    "props": {
+      "progressProps": {
+        "type": "object",
+        "description": "Props passed to the progress bar motion.div"
+      },
+      "className": "string",
+      "children": "React.ReactNode"
+    },
+    "example": "<ScrollProgress><div>Scrollable content here</div></ScrollProgress>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "SpringElement",
+    "category": "custom",
+    "description": "A draggable element connected with an animated spring path that follows the drag motion with realistic spring physics.",
+    "cli": "npx @notacoder15/ak-ui-cli add spring-element",
+    "import": "@/components/ui/custom/spring-element",
+    "export": "SpringElement",
+    "props": {
+      "children": "React.ReactElement",
+      "className": "string",
+      "springClassName": "string",
+      "dragElastic": {
+        "type": "number",
+        "default": 0.2
+      },
+      "springConfig": {
+        "type": "object",
+        "default": "{ stiffness: 200, damping: 16 }"
+      },
+      "springPathConfig": {
+        "type": "object",
+        "description": "Configuration for spring path generation including coilCount, amplitude, etc."
+      }
+    },
+    "example": "<SpringElement><div className=\"w-16 h-16 bg-primary rounded-full\">Drag me</div></SpringElement>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "StarsScrollingWheel",
+    "category": "custom",
+    "description": "An animated counter with scrolling wheel effect that features star animations and particle effects when reaching the target value.",
+    "cli": "npx @notacoder15/ak-ui-cli add stars-scrolling-wheel",
+    "import": "@/components/ui/custom/stars-scrolling-wheel",
+    "export": "StarsScrollingWheel, StarsScrollingWheelProps, Star, StarIcon",
+    "dependencies": [
+      "@/components/ui/icons/icon"
+    ],
+    "props": {
+      "stars": {
+        "type": "number",
+        "description": "Target number to count up to"
+      },
+      "step": {
+        "type": "number",
+        "default": 100
+      },
+      "itemHeight": {
+        "type": "number",
+        "default": 48
+      },
+      "sideItemsCount": {
+        "type": "number",
+        "default": 2
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ stiffness: 90, damping: 30 }"
+      },
+      "inView": {
+        "type": "boolean",
+        "default": false
+      },
+      "inViewOnce": {
+        "type": "boolean",
+        "default": true
+      },
+      "inViewMargin": "string",
+      "delay": {
+        "type": "number",
+        "default": 0
+      },
+      "className": "string"
+    },
+    "example": "<StarsScrollingWheel stars={1500} step={50} inView delay={500} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "CodeTabs",
+    "category": "custom",
+    "description": "A tabbed code viewer with syntax highlighting, copy functionality, and theme support for displaying multiple code snippets.",
+    "cli": "npx @notacoder15/ak-ui-cli add code-tabs",
+    "import": "@/components/ui/custom/code-tabs",
+    "export": "CodeTabs",
+    "dependencies": [
+      "@/components/ui/common/tabs",
+      "@/components/ui/buttons/copy"
+    ],
+    "props": {
+      "codes": "Record<string, string>",
+      "lang": {
+        "type": "string",
+        "default": "bash"
+      },
+      "themes": {
+        "type": "object",
+        "default": {
+          "light": "github-light",
+          "dark": "github-dark"
+        }
+      },
+      "copyButton": {
+        "type": "boolean",
+        "default": true
+      },
+      "onCopy": "function",
+      "defaultValue": "string",
+      "value": "string",
+      "onValueChange": "function"
+    },
+    "example": "<CodeTabs codes={{ npm: 'npm install', yarn: 'yarn add' }} lang=\"bash\" copyButton={true} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Counter",
+    "category": "custom",
+    "description": "An interactive counter component with animated increment/decrement buttons and sliding number transitions.",
+    "cli": "npx @notacoder15/ak-ui-cli add counter",
+    "import": "@/components/ui/custom/counter",
+    "export": "Counter",
+    "dependencies": [
+      "@/components/ui/text/sliding-number",
+      "@/components/ui/buttons/button"
+    ],
+    "props": {
+      "number": "number",
+      "setNumber": "function",
+      "slidingNumberProps": "object",
+      "buttonProps": "object",
+      "transition": "object"
+    },
+    "example": "<Counter number={count} setNumber={setCount} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Cursor",
+    "category": "custom",
+    "description": "Custom cursor effects with provider context, smooth animations, and follow behaviors for enhanced user interactions.",
+    "cli": "npx @notacoder15/ak-ui-cli add cursor",
+    "import": "@/components/ui/custom/cursor",
+    "export": "CursorProvider, Cursor, CursorFollow, useCursor",
+    "props": {
+      "children": "React.ReactNode",
+      "sideOffset": {
+        "type": "number",
+        "default": 15
+      },
+      "align": {
+        "type": "enum",
+        "values": [
+          "top",
+          "top-left",
+          "top-right",
+          "bottom",
+          "bottom-left",
+          "bottom-right",
+          "left",
+          "right",
+          "center"
+        ],
+        "default": "bottom-right"
+      },
+      "transition": "object"
+    },
+    "example": "<CursorProvider><Cursor><div className=\"w-4 h-4 bg-primary rounded-full\" /></Cursor><CursorFollow>Follow element</CursorFollow></CursorProvider>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Files",
+    "category": "custom",
+    "description": "A file explorer component with expandable folders, file icons, and smooth animations for displaying file structures.",
+    "cli": "npx @notacoder15/ak-ui-cli add files",
+    "import": "@/components/ui/custom/files",
+    "export": "Files, Folder, File",
+    "dependencies": [
+      "@/components/ui/common/accordion",
+      "@/components/ui/effects/motion-highlight"
+    ],
+    "props": {
+      "children": "React.ReactNode",
+      "activeClassName": "string",
+      "defaultOpen": "string[]",
+      "open": "string[]",
+      "onOpenChange": "function",
+      "name": "string",
+      "sideComponent": "React.ReactNode"
+    },
+    "example": "<Files><Folder name=\"src\"><File name=\"app.tsx\" /></Folder></Files>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Icon",
+    "category": "icons",
+    "description": "A comprehensive icon animation system with hover, tap, and custom animation support. Provides animated icon wrappers with Motion.js integration.",
+    "cli": "npx @notacoder15/ak-ui-cli add icon",
+    "import": "@/components/ui/icons/icon",
+    "export": "AnimateIcon, IconWrapper, useAnimateIconContext, getVariants, pathClassName, staticAnimations",
+    "props": {
+      "animate": {
+        "type": "boolean | string"
+      },
+      "animateOnHover": {
+        "type": "boolean | string",
+        "default": false
+      },
+      "animateOnTap": {
+        "type": "boolean | string",
+        "default": false
+      },
+      "animation": {
+        "type": "string",
+        "default": "default"
+      },
+      "loop": {
+        "type": "boolean",
+        "default": false
+      },
+      "loopDelay": {
+        "type": "number",
+        "default": 0
+      },
+      "size": {
+        "type": "number",
+        "default": 28
+      },
+      "onAnimateStart": "function",
+      "onAnimateEnd": "function",
+      "onAnimateChange": "function",
+      "className": "string"
+    },
+    "example": "<IconWrapper icon={HeartIcon} animate animateOnHover size={32} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "DropdownMenu",
+    "category": "common",
+    "description": "A menu component with animated highlights and comprehensive item types including checkboxes, radio groups, and submenus.",
+    "cli": "npx @notacoder15/ak-ui-cli add dropdown-menu",
+    "import": "@/components/ui/common/dropdown-menu",
+    "export": "DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuGroup, DropdownMenuPortal",
+    "dependencies": [
+      "@/components/ui/effects/motion-highlight"
+    ],
+    "props": {
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 350, damping: 35 }"
+      },
+      "animateOnHover": {
+        "type": "boolean",
+        "default": true
+      },
+      "align": {
+        "type": "enum",
+        "values": [
+          "start",
+          "center",
+          "end"
+        ],
+        "default": "center"
+      },
+      "side": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "bottom"
+      },
+      "sideOffset": {
+        "type": "number",
+        "default": 4
+      },
+      "inset": {
+        "type": "boolean",
+        "default": false
+      },
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "destructive"
+        ],
+        "default": "default"
+      }
+    },
+    "example": "<DropdownMenu><DropdownMenuTrigger asChild><Button>Open</Button></DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem>Profile</DropdownMenuItem></DropdownMenuContent></DropdownMenu>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "HoverCard",
+    "category": "common",
+    "description": "A card that appears on hover with smooth animations and customizable content positioning.",
+    "cli": "npx @notacoder15/ak-ui-cli add hover-card",
+    "import": "@/components/ui/common/hover-card",
+    "export": "HoverCard, HoverCardTrigger, HoverCardContent",
+    "props": {
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 300, damping: 25 }"
+      },
+      "align": {
+        "type": "enum",
+        "values": [
+          "start",
+          "center",
+          "end"
+        ],
+        "default": "center"
+      },
+      "side": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "bottom"
+      },
+      "sideOffset": {
+        "type": "number",
+        "default": 4
+      },
+      "open": {
+        "type": "boolean"
+      },
+      "defaultOpen": {
+        "type": "boolean"
+      },
+      "onOpenChange": {
+        "type": "function"
+      }
+    },
+    "example": "<HoverCard><HoverCardTrigger asChild><Button variant=\"link\">@username</Button></HoverCardTrigger><HoverCardContent><p>User profile info</p></HoverCardContent></HoverCard>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Dialog",
+    "category": "common",
+    "description": "Modal dialog with 3D flip animations and customizable entry directions.",
+    "cli": "npx @notacoder15/ak-ui-cli add dialog",
+    "import": "@/components/ui/common/dialog",
+    "export": "Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogPortal, DialogOverlay",
+    "props": {
+      "from": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "top"
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 150, damping: 25 }"
+      },
+      "open": {
+        "type": "boolean"
+      },
+      "defaultOpen": {
+        "type": "boolean"
+      },
+      "onOpenChange": {
+        "type": "function"
+      }
+    },
+    "example": "<Dialog><DialogTrigger asChild><Button>Open Dialog</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Title</DialogTitle></DialogHeader></DialogContent></Dialog>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Collapsible",
+    "category": "common",
+    "description": "Expandable content area with smooth height animations and spring transitions.",
+    "cli": "npx @notacoder15/ak-ui-cli add collapsible",
+    "import": "@/components/ui/common/collapsible",
+    "export": "Collapsible, CollapsibleTrigger, CollapsibleContent",
+    "props": {
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 150, damping: 22 }"
+      },
+      "open": {
+        "type": "boolean"
+      },
+      "defaultOpen": {
+        "type": "boolean"
+      },
+      "onOpenChange": {
+        "type": "function"
+      }
+    },
+    "example": "<Collapsible><CollapsibleTrigger asChild><Button>Toggle</Button></CollapsibleTrigger><CollapsibleContent><p>Hidden content</p></CollapsibleContent></Collapsible>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Checkbox",
+    "category": "common",
+    "description": "Animated checkbox with smooth check mark drawing and hover effects.",
+    "cli": "npx @notacoder15/ak-ui-cli add checkbox",
+    "import": "@/components/ui/common/checkbox",
+    "export": "Checkbox",
+    "props": {
+      "checked": {
+        "type": "boolean"
+      },
+      "defaultChecked": {
+        "type": "boolean"
+      },
+      "onCheckedChange": {
+        "type": "function"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "required": {
+        "type": "boolean",
+        "default": false
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      }
+    },
+    "example": "<Checkbox checked={true} onCheckedChange={(checked) => console.log(checked)} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Accordion",
+    "category": "common",
+    "description": "Collapsible content sections with smooth animations and rotating chevron indicators.",
+    "cli": "npx @notacoder15/ak-ui-cli add accordion",
+    "import": "@/components/ui/common/accordion",
+    "export": "Accordion, AccordionItem, AccordionTrigger, AccordionContent",
+    "props": {
+      "type": {
+        "type": "enum",
+        "values": [
+          "single",
+          "multiple"
+        ],
+        "default": "single"
+      },
+      "collapsible": {
+        "type": "boolean",
+        "default": false
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 150, damping: 22 }"
+      },
+      "chevron": {
+        "type": "boolean",
+        "default": true
+      },
+      "value": {
+        "type": "string | string[]"
+      },
+      "defaultValue": {
+        "type": "string | string[]"
+      },
+      "onValueChange": {
+        "type": "function"
+      }
+    },
+    "example": "<Accordion type=\"single\" collapsible><AccordionItem value=\"item-1\"><AccordionTrigger>Question?</AccordionTrigger><AccordionContent>Answer content</AccordionContent></AccordionItem></Accordion>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Tooltip",
+    "category": "common",
+    "description": "A flexible tooltip system with animations, positioning, and global state management.",
+    "cli": "npx @notacoder15/ak-ui-cli add tooltip",
+    "import": "@/components/ui/common/tooltip",
+    "export": "TooltipProvider, Tooltip, TooltipContent, TooltipTrigger",
+    "props": {
+      "side": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "top"
+      },
+      "sideOffset": {
+        "type": "number",
+        "default": 14
+      },
+      "align": {
+        "type": "enum",
+        "values": [
+          "start",
+          "center",
+          "end"
+        ],
+        "default": "center"
+      },
+      "alignOffset": {
+        "type": "number",
+        "default": 0
+      },
+      "openDelay": {
+        "type": "number",
+        "default": 700
+      },
+      "closeDelay": {
+        "type": "number",
+        "default": 300
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 300, damping: 25 }"
+      },
+      "arrow": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "example": "<TooltipProvider><Tooltip><TooltipTrigger><button>Hover me</button></TooltipTrigger><TooltipContent>Tooltip text</TooltipContent></Tooltip></TooltipProvider>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Input",
+    "category": "common",
+    "description": "Styled input field with focus states, validation styling, and file upload support.",
+    "cli": "npx @notacoder15/ak-ui-cli add input",
+    "import": "@/components/ui/common/input",
+    "export": "Input",
+    "props": {
+      "type": {
+        "type": "string",
+        "default": "text"
+      },
+      "placeholder": {
+        "type": "string"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "required": {
+        "type": "boolean",
+        "default": false
+      },
+      "value": {
+        "type": "string"
+      },
+      "defaultValue": {
+        "type": "string"
+      },
+      "onChange": {
+        "type": "function"
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<Input type=\"email\" placeholder=\"Enter your email\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Label",
+    "category": "common",
+    "description": "Accessible label component with proper form association and disabled states.",
+    "cli": "npx @notacoder15/ak-ui-cli add label",
+    "import": "@/components/ui/common/label",
+    "export": "Label",
+    "props": {
+      "htmlFor": {
+        "type": "string"
+      },
+      "className": {
+        "type": "string"
+      },
+      "children": {
+        "type": "React.ReactNode"
+      }
+    },
+    "example": "<Label htmlFor=\"email\">Email Address</Label>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Progress",
+    "category": "common",
+    "description": "Animated progress bar with smooth spring transitions and customizable styling.",
+    "cli": "npx @notacoder15/ak-ui-cli add progress",
+    "import": "@/components/ui/common/progress",
+    "export": "Progress",
+    "props": {
+      "value": {
+        "type": "number"
+      },
+      "max": {
+        "type": "number",
+        "default": 100
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 100, damping: 30 }"
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<Progress value={65} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "RadioGroup",
+    "category": "common",
+    "description": "Animated radio button group with smooth scaling effects and proper accessibility.",
+    "cli": "npx @notacoder15/ak-ui-cli add radio-group",
+    "import": "@/components/ui/common/radio-group",
+    "export": "RadioGroup, RadioGroupItem",
+    "props": {
+      "value": {
+        "type": "string"
+      },
+      "defaultValue": {
+        "type": "string"
+      },
+      "onValueChange": {
+        "type": "function"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "required": {
+        "type": "boolean",
+        "default": false
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 200, damping: 16 }"
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<RadioGroup value={value} onValueChange={setValue}><RadioGroupItem value=\"option1\" id=\"opt1\" /><Label htmlFor=\"opt1\">Option 1</Label></RadioGroup>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Separator",
+    "category": "common",
+    "description": "Visual separator element for dividing content with horizontal and vertical orientations.",
+    "cli": "npx @notacoder15/ak-ui-cli add separator",
+    "import": "@/components/ui/common/separator",
+    "export": "Separator",
+    "props": {
+      "orientation": {
+        "type": "enum",
+        "values": [
+          "horizontal",
+          "vertical"
+        ],
+        "default": "horizontal"
+      },
+      "decorative": {
+        "type": "boolean",
+        "default": true
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<Separator orientation=\"horizontal\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Skeleton",
+    "category": "common",
+    "description": "Loading placeholder with pulse animation for better perceived performance.",
+    "cli": "npx @notacoder15/ak-ui-cli add skeleton",
+    "import": "@/components/ui/common/skeleton",
+    "export": "Skeleton",
+    "props": {
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<Skeleton className=\"h-4 w-32\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Popover",
+    "category": "common",
+    "description": "Floating content container with smooth animations and customizable positioning.",
+    "cli": "npx @notacoder15/ak-ui-cli add popover",
+    "import": "@/components/ui/common/popover",
+    "export": "Popover, PopoverTrigger, PopoverContent, PopoverAnchor",
+    "props": {
+      "open": {
+        "type": "boolean"
+      },
+      "defaultOpen": {
+        "type": "boolean"
+      },
+      "onOpenChange": {
+        "type": "function"
+      },
+      "side": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "bottom"
+      },
+      "align": {
+        "type": "enum",
+        "values": [
+          "start",
+          "center",
+          "end"
+        ],
+        "default": "center"
+      },
+      "sideOffset": {
+        "type": "number",
+        "default": 4
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 300, damping: 25 }"
+      }
+    },
+    "example": "<Popover><PopoverTrigger asChild><Button>Open</Button></PopoverTrigger><PopoverContent><p>Content here</p></PopoverContent></Popover>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Sheet",
+    "category": "common",
+    "description": "Slide-out panel with smooth animations and multiple entry directions.",
+    "cli": "npx @notacoder15/ak-ui-cli add sheet",
+    "import": "@/components/ui/common/sheet",
+    "export": "Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose",
+    "props": {
+      "open": {
+        "type": "boolean"
+      },
+      "defaultOpen": {
+        "type": "boolean"
+      },
+      "onOpenChange": {
+        "type": "function"
+      },
+      "side": {
+        "type": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "default": "right"
+      },
+      "overlay": {
+        "type": "boolean",
+        "default": true
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 150, damping: 25 }"
+      }
+    },
+    "example": "<Sheet><SheetTrigger asChild><Button>Open Sheet</Button></SheetTrigger><SheetContent><SheetHeader><SheetTitle>Title</SheetTitle></SheetHeader></SheetContent></Sheet>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Sidebar",
+    "category": "common",
+    "description": "Collapsible navigation sidebar with responsive behavior and keyboard shortcuts.",
+    "cli": "npx @notacoder15/ak-ui-cli add sidebar",
+    "import": "@/components/ui/common/sidebar",
+    "export": "SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset",
+    "dependencies": [
+      "@/components/ui/buttons/button",
+      "@/components/ui/common/input",
+      "@/components/ui/common/separator",
+      "@/components/ui/common/skeleton",
+      "@/components/ui/common/sheet",
+      "@/components/ui/common/tooltip",
+      "@/components/ui/effects/motion-highlight",
+      "@/hooks/use-mobile"
+    ],
+    "props": {
+      "side": {
+        "type": "enum",
+        "values": [
+          "left",
+          "right"
+        ],
+        "default": "left"
+      },
+      "variant": {
+        "type": "enum",
+        "values": [
+          "sidebar",
+          "floating",
+          "inset"
+        ],
+        "default": "sidebar"
+      },
+      "collapsible": {
+        "type": "enum",
+        "values": [
+          "offcanvas",
+          "icon",
+          "none"
+        ],
+        "default": "offcanvas"
+      },
+      "defaultOpen": {
+        "type": "boolean",
+        "default": true
+      },
+      "animateOnHover": {
+        "type": "boolean",
+        "default": true
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 350, damping: 35 }"
+      }
+    },
+    "example": "<SidebarProvider><Sidebar><SidebarContent><SidebarGroup><SidebarGroupContent><SidebarMenu><SidebarMenuItem><SidebarMenuButton>Item</SidebarMenuButton></SidebarMenuItem></SidebarMenu></SidebarGroupContent></SidebarGroup></SidebarContent></Sidebar><SidebarInset>Main content</SidebarInset></SidebarProvider>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "MotionHighlight",
+    "category": "effects",
+    "description": "Animated highlight system for creating smooth transitions between active states with customizable modes and behaviors.",
+    "cli": "npx @notacoder15/ak-ui-cli add motion-highlight",
+    "import": "@/components/ui/effects/motion-highlight",
+    "export": "MotionHighlight, MotionHighlightItem, useMotionHighlight",
+    "props": {
+      "mode": {
+        "type": "enum",
+        "values": [
+          "children",
+          "parent"
+        ],
+        "default": "children"
+      },
+      "value": {
+        "type": "string | null"
+      },
+      "defaultValue": {
+        "type": "string | null"
+      },
+      "onValueChange": {
+        "type": "function"
+      },
+      "className": {
+        "type": "string"
+      },
+      "activeClassName": {
+        "type": "string"
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 350, damping: 35 }"
+      },
+      "hover": {
+        "type": "boolean",
+        "default": false
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "exitDelay": {
+        "type": "number",
+        "default": 0.2
+      },
+      "controlledItems": {
+        "type": "boolean"
+      },
+      "boundsOffset": {
+        "type": "object"
+      },
+      "containerClassName": {
+        "type": "string"
+      },
+      "forceUpdateBounds": {
+        "type": "boolean"
+      },
+      "asChild": {
+        "type": "boolean",
+        "default": false
+      }
+    },
+    "example": "<MotionHighlight><MotionHighlightItem value=\"item1\"><button>Item 1</button></MotionHighlightItem><MotionHighlightItem value=\"item2\"><button>Item 2</button></MotionHighlightItem></MotionHighlight>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Switch",
+    "category": "common",
+    "description": "Animated toggle switch with smooth transitions, optional icons, and customizable thumb interactions.",
+    "cli": "npx @notacoder15/ak-ui-cli add switch",
+    "import": "@/components/ui/common/switch",
+    "export": "Switch",
+    "props": {
+      "checked": {
+        "type": "boolean"
+      },
+      "defaultChecked": {
+        "type": "boolean"
+      },
+      "onCheckedChange": {
+        "type": "function"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "required": {
+        "type": "boolean",
+        "default": false
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      },
+      "leftIcon": {
+        "type": "React.ReactNode"
+      },
+      "rightIcon": {
+        "type": "React.ReactNode"
+      },
+      "thumbIcon": {
+        "type": "React.ReactNode"
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<Switch checked={true} onCheckedChange={(checked) => console.log(checked)} leftIcon={<Moon />} rightIcon={<Sun />} />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "Tabs",
+    "category": "common",
+    "description": "Animated tab navigation with smooth transitions, motion highlights, and dynamic content sizing.",
+    "cli": "npx @notacoder15/ak-ui-cli add tabs",
+    "import": "@/components/ui/common/tabs",
+    "export": "Tabs, TabsList, TabsTrigger, TabsContent, TabsContents",
+    "dependencies": [
+      "@/components/ui/effects/motion-highlight"
+    ],
+    "props": {
+      "value": {
+        "type": "string"
+      },
+      "defaultValue": {
+        "type": "string"
+      },
+      "onValueChange": {
+        "type": "function"
+      },
+      "orientation": {
+        "type": "enum",
+        "values": [
+          "horizontal",
+          "vertical"
+        ],
+        "default": "horizontal"
+      },
+      "dir": {
+        "type": "enum",
+        "values": [
+          "ltr",
+          "rtl"
+        ]
+      },
+      "activationMode": {
+        "type": "enum",
+        "values": [
+          "automatic",
+          "manual"
+        ],
+        "default": "automatic"
+      },
+      "activeClassName": {
+        "type": "string"
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', stiffness: 200, damping: 25 }"
+      }
+    },
+    "example": "<Tabs value={activeTab} onValueChange={setActiveTab}><TabsList><TabsTrigger value=\"tab1\">Tab 1</TabsTrigger><TabsTrigger value=\"tab2\">Tab 2</TabsTrigger></TabsList><TabsContents><TabsContent value=\"tab1\">Content 1</TabsContent><TabsContent value=\"tab2\">Content 2</TabsContent></TabsContents></Tabs>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "ToggleGroup",
+    "category": "common",
+    "description": "Toggle button group with single/multiple selection modes, animated highlights, and customizable variants.",
+    "cli": "npx @notacoder15/ak-ui-cli add toggle-group",
+    "import": "@/components/ui/common/toggle-group",
+    "export": "ToggleGroup, ToggleGroupItem",
+    "props": {
+      "type": {
+        "type": "enum",
+        "values": [
+          "single",
+          "multiple"
+        ],
+        "default": "single"
+      },
+      "value": {
+        "type": "string | string[]"
+      },
+      "defaultValue": {
+        "type": "string | string[]"
+      },
+      "onValueChange": {
+        "type": "function"
+      },
+      "disabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "variant": {
+        "type": "enum",
+        "values": [
+          "default",
+          "outline"
+        ],
+        "default": "default"
+      },
+      "size": {
+        "type": "enum",
+        "values": [
+          "default",
+          "sm",
+          "lg"
+        ],
+        "default": "default"
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ type: 'spring', bounce: 0, stiffness: 200, damping: 25 }"
+      },
+      "activeClassName": {
+        "type": "string"
+      },
+      "className": {
+        "type": "string"
+      }
+    },
+    "example": "<ToggleGroup type=\"single\" value={value} onValueChange={setValue}><ToggleGroupItem value=\"bold\"><Bold /></ToggleGroupItem><ToggleGroupItem value=\"italic\"><Italic /></ToggleGroupItem></ToggleGroup>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "StarsBackground",
+    "category": "backgrounds",
+    "description": "An animated starfield background with multiple layers of stars moving at different speeds. Features mouse parallax interaction and customizable colors.",
+    "cli": "npx @notacoder15/ak-ui-cli add stars-background",
+    "import": "@/components/ui/backgrounds/stars",
+    "export": "StarsBackground, StarLayer",
+    "props": {
+      "children": "React.ReactNode",
+      "factor": {
+        "type": "number",
+        "default": 0.05
+      },
+      "speed": {
+        "type": "number",
+        "default": 50
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ stiffness: 50, damping: 20 }"
+      },
+      "starColor": {
+        "type": "string",
+        "default": "#fff"
+      },
+      "pointerEvents": {
+        "type": "boolean",
+        "default": true
+      },
+      "className": "string"
+    },
+    "example": "<StarsBackground starColor=\"#ffffff\" speed={50} factor={0.05}><div>Content over stars</div></StarsBackground>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "GradientBackground",
+    "category": "backgrounds",
+    "description": "A smooth animated gradient background that cycles through different positions creating a flowing color effect.",
+    "cli": "npx @notacoder15/ak-ui-cli add gradient-background",
+    "import": "@/components/ui/backgrounds/gradient",
+    "export": "GradientBackground",
+    "props": {
+      "transition": {
+        "type": "object",
+        "default": "{ duration: 15, ease: 'easeInOut', repeat: Infinity }"
+      },
+      "className": "string"
+    },
+    "example": "<GradientBackground className=\"w-full h-full\" />",
+    "version": "1.0.0"
+  },
+  {
+    "name": "BubbleBackground",
+    "category": "backgrounds",
+    "description": "An interactive bubble background with floating orbs that respond to mouse movement and create organic flowing animations.",
+    "cli": "npx @notacoder15/ak-ui-cli add bubble-background",
+    "import": "@/components/ui/backgrounds/bubble",
+    "export": "BubbleBackground",
+    "props": {
+      "children": "React.ReactNode",
+      "interactive": {
+        "type": "boolean",
+        "default": false
+      },
+      "transition": {
+        "type": "object",
+        "default": "{ stiffness: 100, damping: 20 }"
+      },
+      "colors": {
+        "type": "object",
+        "default": "{ first: '18,113,255', second: '221,74,255', third: '0,220,255', fourth: '200,50,50', fifth: '180,180,50', sixth: '140,100,255' }"
+      },
+      "className": "string"
+    },
+    "example": "<BubbleBackground interactive={true}><div>Content over bubbles</div></BubbleBackground>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "HexagonBackground",
+    "category": "backgrounds",
+    "description": "A geometric hexagon pattern background with hover effects and responsive grid layout that adapts to screen size.",
+    "cli": "npx @notacoder15/ak-ui-cli add hexagon-background",
+    "import": "@/components/ui/backgrounds/hexagon",
+    "export": "HexagonBackground",
+    "props": {
+      "children": "React.ReactNode",
+      "hexagonProps": "React.ComponentProps<'div'>",
+      "hexagonSize": {
+        "type": "number",
+        "default": 75
+      },
+      "hexagonMargin": {
+        "type": "number",
+        "default": 3
+      },
+      "className": "string"
+    },
+    "example": "<HexagonBackground hexagonSize={60} hexagonMargin={2}><div>Content over hexagons</div></HexagonBackground>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "FireworksBackground",
+    "category": "backgrounds",
+    "description": "An animated fireworks display with particle explosions, trails, and click interaction for launching custom fireworks.",
+    "cli": "npx @notacoder15/ak-ui-cli add fireworks-background",
+    "import": "@/components/ui/backgrounds/fireworks",
+    "export": "FireworksBackground",
+    "props": {
+      "children": "React.ReactNode",
+      "canvasProps": "React.ComponentProps<'canvas'>",
+      "population": {
+        "type": "number",
+        "default": 1
+      },
+      "color": {
+        "type": "string | string[]",
+        "description": "Single color or array of colors for fireworks"
+      },
+      "fireworkSpeed": {
+        "type": "object | number",
+        "default": "{ min: 4, max: 8 }"
+      },
+      "fireworkSize": {
+        "type": "object | number",
+        "default": "{ min: 2, max: 5 }"
+      },
+      "particleSpeed": {
+        "type": "object | number",
+        "default": "{ min: 2, max: 7 }"
+      },
+      "particleSize": {
+        "type": "object | number",
+        "default": "{ min: 1, max: 5 }"
+      },
+      "className": "string"
+    },
+    "example": "<FireworksBackground population={2} color={['#ff0000', '#00ff00', '#0000ff']}><div>Click anywhere for fireworks</div></FireworksBackground>",
+    "version": "1.0.0"
+  },
+  {
+    "name": "HoleBackground",
+    "category": "backgrounds",
+    "description": "A mesmerizing tunnel effect with radiating lines and floating particles creating a depth illusion and hypnotic animation.",
+    "cli": "npx @notacoder15/ak-ui-cli add hole-background",
+    "import": "@/components/ui/backgrounds/hole",
+    "export": "HoleBackground",
+    "props": {
+      "children": "React.ReactNode",
+      "strokeColor": {
+        "type": "string",
+        "default": "#737373"
+      },
+      "numberOfLines": {
+        "type": "number",
+        "default": 50
+      },
+      "numberOfDiscs": {
+        "type": "number",
+        "default": 50
+      },
+      "particleRGBColor": {
+        "type": "array",
+        "default": "[255, 255, 255]"
+      },
+      "className": "string"
+    },
+    "example": "<HoleBackground strokeColor=\"#737373\" numberOfLines={40} particleRGBColor={[255, 255, 255]}><div>Content over tunnel effect</div></HoleBackground>",
+    "version": "1.0.0"
+  }
+]
