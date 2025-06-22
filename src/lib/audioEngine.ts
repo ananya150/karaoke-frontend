@@ -137,18 +137,44 @@ export class AudioEngine {
       throw new Error('Audio engine not initialized');
     }
 
+    console.log('=== PLAY CALLED ===');
+    console.log('Current pausedAt:', this.pausedAt);
+    console.log('AudioContext state:', this.audioContext.state);
+
     // Resume audio context if suspended (required for user interaction)
     if (this.audioContext.state === 'suspended') {
+      console.log('Resuming suspended audio context...');
       await this.audioContext.resume();
+      console.log('Audio context resumed, new state:', this.audioContext.state);
     }
 
     try {
-      // Stop any currently playing sources
-      this.stop();
+      // Stop any currently playing sources without resetting position
+      console.log('Stopping existing sources...');
+      let existingCount = 0;
+      for (const track of this.tracks.values()) {
+        if (track.source) {
+          try {
+            track.source.stop(0);
+            existingCount++;
+          } catch {
+            // Ignore errors from already stopped sources
+          }
+          track.source = null;
+        }
+      }
+      console.log(`Stopped ${existingCount} existing sources`);
 
       // Create and start sources for all tracks
       const currentTime = this.audioContext.currentTime;
       this.startTime = currentTime - this.pausedAt;
+      
+      console.log('Starting playback:', {
+        currentTime,
+        pausedAt: this.pausedAt,
+        startTime: this.startTime,
+        resumingFrom: this.pausedAt
+      });
 
       for (const track of this.tracks.values()) {
         if (track.buffer) {
@@ -190,25 +216,47 @@ export class AudioEngine {
   pause(): void {
     if (!this.audioContext) return;
 
-    // Stop all sources
+    console.log('=== PAUSE CALLED ===');
+    console.log('Current startTime:', this.startTime);
+    console.log('Current audioContext.currentTime:', this.audioContext.currentTime);
+    console.log('Sources before stopping:', Array.from(this.tracks.values()).map(t => ({ name: t.name, hasSource: !!t.source })));
+
+    // Update paused position first
+    if (this.startTime > 0) {
+      this.pausedAt = this.audioContext.currentTime - this.startTime;
+      console.log('Calculated pausedAt:', this.pausedAt);
+    }
+
+    // Stop all sources immediately
+    let stoppedCount = 0;
     for (const track of this.tracks.values()) {
       if (track.source) {
         try {
-          track.source.stop();
-                 } catch {
-           // Ignore errors from already stopped sources
-         }
+          track.source.stop(0); // Stop immediately with 0 delay
+          console.log(`Stopped source for track: ${track.name}`);
+          stoppedCount++;
+        } catch (error) {
+          console.warn(`Failed to stop source for track ${track.name}:`, error);
+        }
         track.source = null;
       }
     }
+    
+    console.log(`Stopped ${stoppedCount} sources`);
+    console.log('Sources after stopping:', Array.from(this.tracks.values()).map(t => ({ name: t.name, hasSource: !!t.source })));
 
-    // Update paused position
-    if (this.startTime > 0) {
-      this.pausedAt = this.audioContext.currentTime - this.startTime;
-    }
-
-    this.updateState({ isPlaying: false });
+    // Stop time updates first
     this.stopTimeUpdates();
+    console.log('Time updates stopped');
+    
+    // Force the state update with explicit isPlaying: false
+    this.updateState({ 
+      isPlaying: false,
+      currentTime: this.pausedAt 
+    });
+    
+    console.log('State updated to paused, pausedAt:', this.pausedAt);
+    console.log('=== PAUSE COMPLETE ===');
   }
 
   // Stop playback and reset to beginning
@@ -370,8 +418,11 @@ export class AudioEngine {
       // Build state without calling getState() to avoid circular dependency
       const duration = Array.from(this.tracks.values())
         .find(track => track.buffer)?.buffer?.duration || 0;
-      const isPlaying = this.tracks.size > 0 && Array.from(this.tracks.values())
+      
+      // Only calculate isPlaying if not explicitly provided in partialState
+      const calculatedIsPlaying = this.tracks.size > 0 && Array.from(this.tracks.values())
         .some(track => track.source !== null);
+      const isPlaying = partialState.isPlaying !== undefined ? partialState.isPlaying : calculatedIsPlaying;
       
       const currentState: AudioEngineState = {
         isPlaying,

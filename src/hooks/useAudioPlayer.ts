@@ -65,12 +65,29 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       console.log('Initializing new AudioEngine instance');
       audioEngineRef.current = new AudioEngine();
       
-      // Set up state change callback with throttling to prevent re-render loops
+      // Set up state change callback with special handling for pause/play states
       let lastUpdate = 0;
+      let lastIsPlaying = false;
+      
       audioEngineRef.current.setStateChangeCallback((newState) => {
         const now = Date.now();
-        // Throttle updates to max 30fps for smooth timeline updates
-        if (now - lastUpdate > 33) {
+        
+        // For pause/play state changes, update immediately without throttling
+        const isPlayingChanged = lastIsPlaying !== newState.isPlaying;
+        lastIsPlaying = newState.isPlaying;
+        
+        if (isPlayingChanged) {
+          console.log('Play/Pause state changed immediately:', { 
+            from: !newState.isPlaying, 
+            to: newState.isPlaying,
+            currentTime: newState.currentTime 
+          });
+          setEngineState(newState);
+          if (audioEngineRef.current) {
+            setTrackStates(audioEngineRef.current.getTrackStates());
+          }
+        } else if (now - lastUpdate > 33) {
+          // Throttle other updates to max 30fps for smooth timeline updates
           lastUpdate = now;
           setEngineState(newState);
           // Also update track states when engine state changes

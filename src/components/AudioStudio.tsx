@@ -341,18 +341,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
       error: audioPlayer.error
     });
     
-    // Debug: Monitor time updates for 5 seconds
-    if (!audioPlayer.isPlaying) {
-      let debugCount = 0;
-      const debugInterval = setInterval(() => {
-        console.log(`Time update ${debugCount++}:`, {
-          currentTime: audioPlayer.currentTime,
-          duration: audioPlayer.duration,
-          isPlaying: audioPlayer.isPlaying
-        });
-        if (debugCount >= 10) clearInterval(debugInterval);
-      }, 500);
-    }
+
     
     try {
       // Check if any tracks are loaded
