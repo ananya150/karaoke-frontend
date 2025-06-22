@@ -69,8 +69,8 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       let lastUpdate = 0;
       audioEngineRef.current.setStateChangeCallback((newState) => {
         const now = Date.now();
-        // Throttle updates to max 10fps to prevent excessive re-renders
-        if (now - lastUpdate > 100) {
+        // Throttle updates to max 30fps for smooth timeline updates
+        if (now - lastUpdate > 33) {
           lastUpdate = now;
           setEngineState(newState);
           // Also update track states when engine state changes

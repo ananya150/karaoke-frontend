@@ -249,8 +249,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           fetch(trackUrls.vocals)
           .then(r => r.blob())
           .then(blob => {
-            const f = new File([blob], 'waveform.mp3', { type: blob.type });
-            setWaveformVocalsFile(f);
+            if (!isCancelled) {
+              const f = new File([blob], 'waveform.mp3', { type: blob.type });
+              setWaveformVocalsFile(f);
+            }
           })
           .catch(err => console.error('Waveform fetch failed:', err));
         }
@@ -259,8 +261,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           fetch(trackUrls.drums)
           .then(r => r.blob())
           .then(blob => {
-            const f = new File([blob], 'waveform.mp3', { type: blob.type });
-            setWaveformDrumsFile(f);
+            if (!isCancelled) {
+              const f = new File([blob], 'waveform.mp3', { type: blob.type });
+              setWaveformDrumsFile(f);
+            }
           })
           .catch(err => console.error('Waveform fetch failed:', err));
         }
@@ -269,8 +273,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           fetch(trackUrls.bass)
           .then(r => r.blob())
           .then(blob => {
-            const f = new File([blob], 'waveform.mp3', { type: blob.type });
-            setWaveformBassFile(f);
+            if (!isCancelled) {
+              const f = new File([blob], 'waveform.mp3', { type: blob.type });
+              setWaveformBassFile(f);
+            }
           })
           .catch(err => console.error('Waveform fetch failed:', err));
         }
@@ -279,8 +285,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           fetch(trackUrls.other)
           .then(r => r.blob())
           .then(blob => {
-            const f = new File([blob], 'waveform.mp3', { type: blob.type });
-            setWaveformOtherFile(f);
+            if (!isCancelled) {
+              const f = new File([blob], 'waveform.mp3', { type: blob.type });
+              setWaveformOtherFile(f);
+            }
           })
           .catch(err => console.error('Waveform fetch failed:', err));
         }
@@ -288,8 +296,13 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
         // Load audio tracks
         if (Object.keys(trackUrls).length > 0 && !isCancelled) {
           console.log('Loading audio tracks:', trackUrls);
+          console.log('AudioPlayer instance:', audioPlayer);
+          console.log('AudioPlayer loadTracks method:', typeof audioPlayer.loadTracks);
+          
           await audioPlayer.loadTracks(trackUrls);
+          
           if (!isCancelled) {
+            console.log('Audio tracks loaded, checking states:', audioPlayer.trackStates);
             toast.success('Audio tracks loaded successfully!');
           }
         } else {
@@ -316,7 +329,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     return () => {
       isCancelled = true;
     };
-  }, [results, jobId]); // Remove audioPlayer from dependencies
+  }, [results, jobId, audioPlayer.loadTracks]); // Fixed: Include audioPlayer.loadTracks as dependency
 
   const handlePlayPause = async () => {
     console.log('Play button clicked. Current state:', {
@@ -327,6 +340,19 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
       isLoading: audioPlayer.isLoading,
       error: audioPlayer.error
     });
+    
+    // Debug: Monitor time updates for 5 seconds
+    if (!audioPlayer.isPlaying) {
+      let debugCount = 0;
+      const debugInterval = setInterval(() => {
+        console.log(`Time update ${debugCount++}:`, {
+          currentTime: audioPlayer.currentTime,
+          duration: audioPlayer.duration,
+          isPlaying: audioPlayer.isPlaying
+        });
+        if (debugCount >= 10) clearInterval(debugInterval);
+      }, 500);
+    }
     
     try {
       // Check if any tracks are loaded
@@ -455,7 +481,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               </Button>
               
               <div className="text-white text-sm font-satoshi font-bold">
-                {audioPlayer.formatTime(audioPlayer.currentTime)}
+                {audioPlayer.formatTime(audioPlayer.currentTime)} / {audioPlayer.formatTime(audioPlayer.duration)}
               </div>
             </div>
 
