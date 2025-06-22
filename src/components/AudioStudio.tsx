@@ -109,13 +109,20 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    
+    if (mins === 0) {
+      return `${secs}s`;
+    } else if (secs === 0) {
+      return `${mins}m`;
+    } else {
+      return `${mins}m ${secs}s`;
+    }
   };
 
   const timeMarkers = [];
   // Ensure duration is valid and interval is at least 1 second
   const safeDuration = Math.max(1, duration || 1);
-  const interval = Math.max(1, Math.ceil(safeDuration / 8)); // Show ~8 markers
+  const interval = 30; // Show ~8 markers
   
   // Limit the number of markers to prevent infinite loops
   const maxMarkers = 20;
@@ -127,24 +134,22 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
   }
 
   return (
-    <div className="h-8 bg-gray-800 border-b border-gray-700 flex items-end relative px-12">
+    <div className="h-[35px] bg-[#393839] flex items-end relative px-2">
       {timeMarkers.map((time, index) => (
         <div 
           key={index}
-          className="absolute bottom-0 text-xs text-gray-400"
-          style={{ left: `${12 + (time / safeDuration) * (100 - 24)}%` }}
+          className="absolute top-1.5 text-xs text-[#656565] font-satoshi font-bold"
+          style={{ left: `${1 + (time / safeDuration) * (100)}%` }}
         >
-          <div className="w-px h-4 bg-gray-600 mb-1"></div>
           {formatTime(time)}
         </div>
       ))}
       
       {/* Current time cursor */}
       <div 
-        className="absolute top-0 w-px h-full bg-white shadow-lg transition-all duration-100"
-        style={{ left: `${12 + (currentTime / safeDuration) * (100 - 24)}%` }}
+        className="absolute top-2 w-[3px] h-[215px] rounded-full bg-white shadow-lg transition-all duration-100"
+        style={{ left: `${1 + (currentTime / safeDuration) * (100)}%` }}
       >
-        <div className="w-3 h-3 bg-white rounded-full transform -translate-x-1/2 -translate-y-1"></div>
       </div>
     </div>
   );
@@ -371,7 +376,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   }
 
   return (
-    <div className="h-screen bg-black text-white flex flex-col">
+    <div className="h-screen text-white flex flex-col">
       {/* Header */}
       {/* <div className="h-16 bg-gray-900 border-b border-gray-700 flex items-center justify-between px-6">
         <div className="flex items-center space-x-4">
@@ -405,7 +410,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Lyrics/Content Area */}
-        <div className="flex-1 bg-black flex items-center justify-center p-8">
+        {/* <div className="flex-1 bg-black flex items-center justify-center p-8">
           <div className="text-center max-w-4xl">
             <div className="text-6xl font-bold text-white mb-8 leading-tight">
                              <div className="mb-4 opacity-60">It&apos;s the music</div>
@@ -416,7 +421,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               <div className="opacity-60">Nike shoes</div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Controls Bar */}
         <div className="h-14 bg-[#2A2828] border-t border-gray-700 flex items-center justify-between px-2">
@@ -505,16 +510,35 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           </div>
         </div>
 
+        <div className='h-[230px] bg-black w-full flex'>
+          {/* Sidebar */}
+          <div className='w-[55px] bg-[#1A1B1D]'>
+
+          </div>
+          <div className='w-[calc(100%-55px)] flex flex-col'>
+            {/* Timeline */}
+            <div className='h-[35px] bg-[#393839] w-full'>
+              <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
+            </div>
+            {/* Waveform */}
+            <div className='h-[195px] bg-black'>
+
+            </div>
+
+          </div>
+
+        </div>
+
         {/* Timeline */}
-        <div 
+        {/* <div 
           className="cursor-pointer"
           onClick={handleTimelineClick}
         >
           <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
-        </div>
+        </div> */}
 
         {/* Waveform Tracks */}
-        <div className="border-t border-gray-700">
+        {/* <div className="border-t border-gray-700">
           <WaveformTrack
             trackName="vocals"
             color="#3B82F6" // Blue
@@ -551,7 +575,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
             isMuted={audioPlayer.trackStates.other?.isMuted || false}
             onTrackClick={() => handleTrackMute('other')}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
