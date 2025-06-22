@@ -127,3 +127,8 @@
   --liquid-color: rgb(59 130 246);
   --liquid-bg: rgb(239 246 255);
 }
+
+/* globals.css */
+.wave-container {
+  @apply w-full h-16 flex items-center;        /* 64 px height; tweak as you wish */
+}

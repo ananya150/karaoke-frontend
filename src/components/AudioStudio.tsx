@@ -20,6 +20,7 @@ import { JobResultsResponse } from '@/types/api';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import RoundedTimeline from './RoundedTimeline';
 
 interface AudioStudioProps {
   jobId: string;
@@ -164,6 +165,11 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
+
+  const [waveformVocalsFile, setWaveformVocalsFile] = useState<File | null>(null);
+  const [waveformDrumsFile, setWaveformDrumsFile] = useState<File | null>(null);
+  const [waveformBassFile, setWaveformBassFile] = useState<File | null>(null);
+  const [waveformOtherFile, setWaveformOtherFile] = useState<File | null>(null);
   
   // Volume states for vocals and instruments (non-vocal tracks combined)
   const [vocalsVolume, setVocalsVolume] = useState([70]);
@@ -240,15 +246,43 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
         
         if (results.download_links.vocals_stem) {
           trackUrls.vocals = api.getFileDownloadURL(jobId, results.download_links.vocals_stem.split('/').pop() || '');
+          fetch(trackUrls.vocals)
+          .then(r => r.blob())
+          .then(blob => {
+            const f = new File([blob], 'waveform.mp3', { type: blob.type });
+            setWaveformVocalsFile(f);
+          })
+          .catch(err => console.error('Waveform fetch failed:', err));
         }
         if (results.download_links.drums_stem) {
           trackUrls.drums = api.getFileDownloadURL(jobId, results.download_links.drums_stem.split('/').pop() || '');
+          fetch(trackUrls.drums)
+          .then(r => r.blob())
+          .then(blob => {
+            const f = new File([blob], 'waveform.mp3', { type: blob.type });
+            setWaveformDrumsFile(f);
+          })
+          .catch(err => console.error('Waveform fetch failed:', err));
         }
         if (results.download_links.bass_stem) {
           trackUrls.bass = api.getFileDownloadURL(jobId, results.download_links.bass_stem.split('/').pop() || '');
+          fetch(trackUrls.bass)
+          .then(r => r.blob())
+          .then(blob => {
+            const f = new File([blob], 'waveform.mp3', { type: blob.type });
+            setWaveformBassFile(f);
+          })
+          .catch(err => console.error('Waveform fetch failed:', err));
         }
         if (results.download_links.other_stem) {
           trackUrls.other = api.getFileDownloadURL(jobId, results.download_links.other_stem.split('/').pop() || '');
+          fetch(trackUrls.other)
+          .then(r => r.blob())
+          .then(blob => {
+            const f = new File([blob], 'waveform.mp3', { type: blob.type });
+            setWaveformOtherFile(f);
+          })
+          .catch(err => console.error('Waveform fetch failed:', err));
         }
         
         // Load audio tracks
@@ -381,125 +415,107 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
 
   return (
     <div className="h-screen text-white flex flex-col">
-      {/* Header */}
-      {/* <div className="h-16 bg-gray-900 border-b border-gray-700 flex items-center justify-between px-6">
-        <div className="flex items-center space-x-4">
-          <div className="bg-blue-600 p-2 rounded">
-            <Music className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-white">{results.original_filename}</h1>
-            <p className="text-sm text-gray-400">
-              {formatTime(results.audio_duration)} • {results.beat_analysis.tempo_bpm.toFixed(1)} BPM
-              {audioPlayer.isLoading && (
-                <span className="ml-2 text-yellow-400">• Loading audio...</span>
-              )}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <Badge variant="secondary" className="bg-green-900 text-green-400">
-            {Math.round(results.file_size / 1024 / 1024)}MB
-          </Badge>
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              <Home className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-          </Link>
-        </div>
-      </div> */}
-
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Lyrics/Content Area */}
-        {/* <div className="flex-1 bg-black flex items-center justify-center p-8">
-          <div className="text-center max-w-4xl">
-            <div className="text-6xl font-bold text-white mb-8 leading-tight">
-                             <div className="mb-4 opacity-60">It&apos;s the music</div>
-               <div className="mb-4 opacity-60">that we choose</div>
-               <div className="mb-8">The world is</div>
-               <div className="mb-8">spinning too fast</div>
-               <div className="mb-4 opacity-60">I&apos;m buying that</div>
-              <div className="opacity-60">Nike shoes</div>
-            </div>
-          </div>
-        </div> */}
-
-        {/* Controls Bar */}
-        <div className="h-14 bg-[#2A2828] border-t border-gray-700 flex items-center justify-between px-2">
-          <div className="flex items-center space-x-4">
-            <Button
-              onClick={handlePlayPause}
-              size="sm"
-              className="w-6.5 h-6.5 rounded-full bg-white text-black hover:bg-gray-200"
-              disabled={audioPlayer.isLoading}
-            >
-              {audioPlayer.isLoading ? (
-                <Loader2 className="h-4.5 w-4.5 animate-spin" />
-              ) : audioPlayer.isPlaying ? (
-                <Pause fill='#000' className="h-2 w-2" />
-              ) : (
-                <Play fill='#000' className="h-2 w-2" />
-              )}
-            </Button>
-            
-            <div className="text-white text-sm font-satoshi font-bold">
-              {audioPlayer.formatTime(audioPlayer.currentTime)}
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-10">
-            {/* Vocals Volume Control */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">vocals</span>
-              <Slider
-                value={vocalsVolume}
-                onValueChange={(value) => {
-                  setVocalsVolume(value);
-                  audioPlayer.setTrackVolume('vocals', value[0] / 100);
-                }}
-                max={100}
-                step={1}
-                className="w-20"
-              />
-            </div>
-            
-            {/* Instruments Volume Control */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">instruments</span>
-              <Slider
-                value={instrumentsVolume}
-                onValueChange={(value) => {
-                  setInstrumentsVolume(value);
-                  // Set volume for all non-vocal tracks
-                  audioPlayer.setTrackVolume('drums', value[0] / 100);
-                  audioPlayer.setTrackVolume('bass', value[0] / 100);
-                  audioPlayer.setTrackVolume('other', value[0] / 100);
-                }}
-                max={100}
-                step={1}
-                className="w-20"
-              />
-            </div>
-            
-            {/* Download button */}
-            <div className="relative group">
-              <Button className='bg-[#393939] hover:bg-[#393939]/80 w-8 h-8'>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+        <div className="flex-1 bg-black relative">
+          <div 
+            className="absolute inset-0 opacity-15"
+            style={{
+              backgroundImage: `
+                linear-gradient(45deg, #555 25%, transparent 25%), 
+                linear-gradient(-45deg, #555 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #555 75%), 
+                linear-gradient(-45deg, transparent 75%, #555 75%)
+              `,
+              backgroundSize: '30px 30px',
+              backgroundPosition: '0 0, 0 15px, 15px -15px, -15px 0px'
+            }}
+          />
         </div>
 
-        <div className='h-[230px] bg-black w-full flex'>
+        {/* Controls Bar */}
+        <div className='bottom-0 fixed w-full'>
+
+          <div className="h-14 bg-[#2A2828] flex items-center justify-between px-2">
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={handlePlayPause}
+                size="sm"
+                className="w-6.5 h-6.5 rounded-full bg-white text-black hover:bg-gray-200"
+                disabled={audioPlayer.isLoading}
+              >
+                {audioPlayer.isLoading ? (
+                  <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                ) : audioPlayer.isPlaying ? (
+                  <Pause fill='#000' className="h-2 w-2" />
+                ) : (
+                  <Play fill='#000' className="h-2 w-2" />
+                )}
+              </Button>
+              
+              <div className="text-white text-sm font-satoshi font-bold">
+                {audioPlayer.formatTime(audioPlayer.currentTime)}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-10">
+              {/* Vocals Volume Control */}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">vocals</span>
+                <Slider
+                  value={vocalsVolume}
+                  onValueChange={(value) => {
+                    setVocalsVolume(value);
+                    audioPlayer.setTrackVolume('vocals', value[0] / 100);
+                  }}
+                  max={100}
+                  step={1}
+                  className="w-20"
+                />
+              </div>
+              
+              {/* Instruments Volume Control */}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">instruments</span>
+                <Slider
+                  value={instrumentsVolume}
+                  onValueChange={(value) => {
+                    setInstrumentsVolume(value);
+                    // Set volume for all non-vocal tracks
+                    audioPlayer.setTrackVolume('drums', value[0] / 100);
+                    audioPlayer.setTrackVolume('bass', value[0] / 100);
+                    audioPlayer.setTrackVolume('other', value[0] / 100);
+                  }}
+                  max={100}
+                  step={1}
+                  className="w-20"
+                />
+              </div>
+              
+              {/* Download button */}
+              <div className="relative group">
+                <Button className='bg-[#393939] hover:bg-[#393939]/80 w-8 h-8'>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        <div className='h-[240px] bg-black w-full flex'>
           {/* Sidebar */}
-          <div className='w-[55px] bg-[#1A1B1D] pt-[45px] pb-[20px] flex flex-col items-center justify-between'>
-            <MicVocal  className='h-5 w-5 text-[#3E84E8]' />
-            <KeyboardMusic  className='h-5 w-5 text-[#C19549]' />
-            <Guitar className='h-5 w-5 text-[#FC66F0]' />
-            <Drum className='h-5 w-5 text-[#9DF8D6]' />
+          <div className='w-[55px] bg-[#1A1B1D] pt-[55px] pb-8 flex flex-col items-center justify-between'>
+            <button onClick={() => handleTrackMute('vocals')}>
+              <MicVocal  className='h-5 w-5 text-[#3E84E8]' />
+            </button>
+            <button onClick={() => handleTrackMute('other')}>
+              <KeyboardMusic  className='h-5 w-5 text-[#C19549]' />
+            </button>
+            <button onClick={() => handleTrackMute('bass')}>
+              <Guitar className='h-5 w-5 text-[#FC66F0]' />
+            </button>
+            <button onClick={() => handleTrackMute('drums')}>
+              <Drum className='h-5 w-5 text-[#9DF8D6]' />
+            </button>
               
           </div>
           <div className='w-[calc(100%-55px)] flex flex-col'>
@@ -508,61 +524,45 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
             </div>
             {/* Waveform */}
-            <div className='h-[195px] bg-black'>
-
+            <div className='h-[210px] bg-black flex flex-col items-center justify-between pt-4 pb-8 px-4'>
+             {/* <RoundedTimeline file={waveformVocalsFile} /> */}
+             <RoundedTimeline
+                file={waveformVocalsFile}
+                containerColor={audioPlayer.trackStates.vocals?.isMuted ? "#030C3D" : "#0561F0"} 
+                waveformColor={audioPlayer.trackStates.vocals?.isMuted ? "#18253D" : "#8DAFFF"}  
+                barRadius={26}
+                silenceRms={0.005}
+                bucketMs={10}
+              />
+             <RoundedTimeline
+                file={waveformOtherFile}
+                containerColor={audioPlayer.trackStates.other?.isMuted ? "#3F1704" : "#FD7F00"} 
+                waveformColor={audioPlayer.trackStates.other?.isMuted ? "#3B281B" : "#FCC28C"}
+                barRadius={26}
+                silenceRms={0.005}
+                bucketMs={10}
+              />
+             <RoundedTimeline
+                file={waveformBassFile}
+                containerColor={audioPlayer.trackStates.bass?.isMuted ? "#3F1704" : "#DD2DF9"}
+                waveformColor="#EF9EFB"   /* white waveform */
+                barRadius={26}
+                silenceRms={0.005}
+                bucketMs={10}
+              />
+             <RoundedTimeline
+                file={waveformDrumsFile}
+                containerColor="#4EF5C3" 
+                waveformColor="rgba(255, 255, 255, 0.7)"   /* white waveform */
+                barRadius={26}
+                silenceRms={0.005}
+                bucketMs={10}
+              />
             </div>
-
           </div>
-
         </div>
 
-        {/* Timeline */}
-        {/* <div 
-          className="cursor-pointer"
-          onClick={handleTimelineClick}
-        >
-          <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
-        </div> */}
-
-        {/* Waveform Tracks */}
-        {/* <div className="border-t border-gray-700">
-          <WaveformTrack
-            trackName="vocals"
-            color="#3B82F6" // Blue
-            waveformData={waveforms.vocals}
-            duration={audioPlayer.duration}
-            currentTime={audioPlayer.currentTime}
-            isMuted={audioPlayer.trackStates.vocals?.isMuted || false}
-            onTrackClick={() => handleTrackMute('vocals')}
-          />
-          <WaveformTrack
-            trackName="drums"
-            color="#F97316" // Orange
-            waveformData={waveforms.drums}
-            duration={audioPlayer.duration}
-            currentTime={audioPlayer.currentTime}
-            isMuted={audioPlayer.trackStates.drums?.isMuted || false}
-            onTrackClick={() => handleTrackMute('drums')}
-          />
-          <WaveformTrack
-            trackName="bass"
-            color="#EC4899" // Pink
-            waveformData={waveforms.bass}
-            duration={audioPlayer.duration}
-            currentTime={audioPlayer.currentTime}
-            isMuted={audioPlayer.trackStates.bass?.isMuted || false}
-            onTrackClick={() => handleTrackMute('bass')}
-          />
-          <WaveformTrack
-            trackName="other"
-            color="#10B981" // Green
-            waveformData={waveforms.other}
-            duration={audioPlayer.duration}
-            currentTime={audioPlayer.currentTime}
-            isMuted={audioPlayer.trackStates.other?.isMuted || false}
-            onTrackClick={() => handleTrackMute('other')}
-          />
-        </div> */}
+        </div>
       </div>
     </div>
   );
