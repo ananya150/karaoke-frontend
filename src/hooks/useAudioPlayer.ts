@@ -77,11 +77,6 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
         
         // Only update immediately for actual play/pause changes, otherwise throttle
         if (isPlayingChanged) {
-          console.log('Play/Pause state changed immediately:', { 
-            from: lastIsPlaying, 
-            to: newState.isPlaying,
-            currentTime: newState.currentTime 
-          });
           lastIsPlaying = newState.isPlaying;
           lastUpdate = now; // Reset throttle timer
           setEngineState(newState);

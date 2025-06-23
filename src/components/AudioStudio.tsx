@@ -310,7 +310,6 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
     
     try {
       await audioPlayer.seek(newTime);
-      console.log(`Successfully seeked to ${newTime.toFixed(2)}s`);
     } catch (error) {
       console.error('Failed to seek:', error);
       toast.error('Seek failed', {
