@@ -359,11 +359,12 @@ export class AudioEngine {
 
 
 
-  // Set track volume (0-100)
+  // Set track volume (0-1 range)
   setTrackVolume(trackName: string, volume: number): void {
     const track = this.tracks.get(trackName);
     if (track) {
-      track.volume = Math.max(0, Math.min(100, volume));
+      const volumePercent = Math.max(0, Math.min(100, volume * 100));
+      track.volume = volumePercent;
       this.updateTrackGain(track);
     }
   }

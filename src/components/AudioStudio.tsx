@@ -406,34 +406,34 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               {/* Vocals Volume Control */}
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">vocals</span>
-                <Slider
-                  value={vocalsVolume}
-                  onValueChange={(value) => {
-                    setVocalsVolume(value);
-                    audioPlayer.setTrackVolume('vocals', value[0] / 100);
-                  }}
-                  max={100}
-                  step={1}
-                  className="w-20"
-                />
+                              <Slider
+                value={vocalsVolume}
+                onValueChange={(value) => {
+                  setVocalsVolume(value);
+                  audioPlayer.setTrackVolume('vocals', value[0] / 100);
+                }}
+                max={100}
+                step={1}
+                className="w-20"
+              />
               </div>
               
               {/* Instruments Volume Control */}
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-[#626060] font-satoshi font-bold mb-[2px]">instruments</span>
-                <Slider
-                  value={instrumentsVolume}
-                  onValueChange={(value) => {
-                    setInstrumentsVolume(value);
-                    // Set volume for all non-vocal tracks
-                    audioPlayer.setTrackVolume('drums', value[0] / 100);
-                    audioPlayer.setTrackVolume('bass', value[0] / 100);
-                    audioPlayer.setTrackVolume('other', value[0] / 100);
-                  }}
-                  max={100}
-                  step={1}
-                  className="w-20"
-                />
+                              <Slider
+                value={instrumentsVolume}
+                onValueChange={(value) => {
+                  setInstrumentsVolume(value);
+                  // Set volume for all non-vocal tracks
+                  audioPlayer.setTrackVolume('drums', value[0] / 100);
+                  audioPlayer.setTrackVolume('bass', value[0] / 100);
+                  audioPlayer.setTrackVolume('other', value[0] / 100);
+                }}
+                max={100}
+                step={1}
+                className="w-20"
+              />
               </div>
               
               {/* Download button */}
