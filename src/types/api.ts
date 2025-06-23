@@ -114,6 +114,30 @@ export interface BeatAnalysisResult {
   processing_time: number;
 }
 
+export interface AudioMetadata {
+  title?: string;
+  artist?: string;
+  album?: string;
+  albumartist?: string;
+  date?: string;
+  year?: number;
+  genre?: string;
+  track?: number | null;
+  tracktotal?: number | null;
+  disc?: number | null;
+  duration: number;
+  bitrate: number;
+  channels: number;
+  sample_rate: number;
+  format: string;
+  filesize: number;
+  cover_image_path?: string;
+  cover_image_format?: string;
+  cover_image_width?: number;
+  cover_image_height?: number;
+  cover_image_size?: number;
+}
+
 export interface JobResultsResponse {
   job_id: string;
   status: JobStatus;
@@ -125,6 +149,7 @@ export interface JobResultsResponse {
   original_filename: string;
   audio_duration: number;
   file_size: number;
+  audio_metadata?: AudioMetadata;
   
   stem_separation: StemSeparationResult;
   transcription: TranscriptionResult;
