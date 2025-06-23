@@ -323,6 +323,14 @@ export class AudioEngine {
     const startDelay = 0.01; // 10ms delay
     const currentTime = this.audioContext.currentTime + startDelay;
     this.startTime = currentTime - newTime;
+    
+    console.log('Seek timing calculation:', {
+      audioContextCurrentTime: this.audioContext.currentTime,
+      adjustedCurrentTime: currentTime,
+      seekToTime: newTime,
+      calculatedStartTime: this.startTime,
+      expectedCurrentTime: currentTime - this.startTime
+    });
 
     let sourcesCreated = 0;
     for (const track of this.tracks.values()) {
@@ -361,6 +369,9 @@ export class AudioEngine {
     console.log('Updating state with isPlaying: true and currentTime:', newTime);
     this.updateState({ currentTime: newTime, isPlaying: true });
     console.log('State update complete');
+    
+    // Force update pausedAt to match the seek position to sync time calculations
+    this.pausedAt = newTime;
     
     // Restart time updates
     this.startTimeUpdates();
@@ -460,8 +471,22 @@ export class AudioEngine {
     const playing = isPlaying !== undefined ? isPlaying : 
       (this.tracks.size > 0 && Array.from(this.tracks.values()).some(track => track.source !== null));
     
-    if (playing && this.startTime > 0) {
-      return this.audioContext.currentTime - this.startTime;
+    if (playing && this.startTime !== 0) {
+      const calculatedTime = this.audioContext.currentTime - this.startTime;
+      
+      // Debug timing issues - only log first few calculations after seek
+      if (Math.abs(calculatedTime - this.pausedAt) > 1) {
+        console.log('getCurrentTime calculation:', {
+          playing,
+          audioContextCurrentTime: this.audioContext.currentTime,
+          startTime: this.startTime,
+          calculatedTime,
+          pausedAt: this.pausedAt,
+          timeDifference: calculatedTime - this.pausedAt
+        });
+      }
+      
+      return calculatedTime;
     }
     
     return this.pausedAt;
@@ -478,15 +503,18 @@ export class AudioEngine {
       const currentTime = this.getCurrentTime(isPlaying);
       const duration = Array.from(this.tracks.values()).find(track => track.buffer)?.buffer?.duration || 0;
       
-      // Debug first few updates
-      if (updateCount <= 5) {
+      // Debug first few updates or when time seems stuck
+      const timeChanged = Math.abs(currentTime - this.pausedAt) > 0.1;
+      if (updateCount <= 5 || (!timeChanged && isPlaying)) {
         console.log(`Time update ${updateCount}:`, {
           isPlaying,
           currentTime,
           duration,
           startTime: this.startTime,
           pausedAt: this.pausedAt,
-          audioContextCurrentTime: this.audioContext?.currentTime
+          audioContextCurrentTime: this.audioContext?.currentTime,
+          timeChanged,
+          sourcesActive: Array.from(this.tracks.values()).map(t => ({ name: t.name, hasSource: !!t.source }))
         });
       }
       
