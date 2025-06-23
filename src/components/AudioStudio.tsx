@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Play, 
   Pause, 
@@ -25,90 +25,6 @@ import RoundedTimeline from './RoundedTimeline';
 interface AudioStudioProps {
   jobId: string;
 }
-
-
-
-// Mock waveform data - in a real implementation, this would be generated from the audio files
-const generateMockWaveform = (duration: number, density: number = 200) => {
-  const points = [];
-  for (let i = 0; i < density; i++) {
-    const amplitude = Math.random() * 0.8 + 0.1; // Random amplitude between 0.1 and 0.9
-    points.push(amplitude);
-  }
-  return points;
-};
-
-const WaveformTrack = ({ 
-  trackName, 
-  color, 
-  waveformData, 
-  duration, 
-  currentTime, 
-  isMuted, 
-  onTrackClick 
-}: {
-  trackName: string;
-  color: string;
-  waveformData: number[];
-  duration: number;
-  currentTime: number;
-  isMuted: boolean;
-  onTrackClick: () => void;
-}) => {
-  const getTrackIcon = (track: string) => {
-    switch (track) {
-      case 'vocals': return '🎤';
-      case 'drums': return '🥁';
-      case 'bass': return '🎸';
-      case 'other': return '🎹';
-      default: return '🎵';
-    }
-  };
-
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  return (
-    <div className="flex items-center h-16 bg-gray-900 border-b border-gray-700">
-      {/* Track Icon */}
-      <div 
-        className={`w-12 h-12 flex items-center justify-center cursor-pointer transition-opacity ${
-          isMuted ? 'opacity-30' : 'opacity-100'
-        }`}
-        onClick={onTrackClick}
-      >
-        <span className="text-2xl">{getTrackIcon(trackName)}</span>
-      </div>
-      
-      {/* Waveform */}
-      <div className="flex-1 h-full relative overflow-hidden">
-        <div className="flex items-center h-full px-2">
-          {waveformData.map((amplitude, index) => (
-            <div
-              key={index}
-              className={`w-1 mx-px transition-opacity ${
-                isMuted ? 'opacity-30' : 'opacity-100'
-              }`}
-              style={{
-                height: `${amplitude * 40}px`,
-                backgroundColor: color,
-                minHeight: '2px'
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Progress overlay */}
-        <div 
-          className="absolute top-0 left-12 h-full bg-white opacity-20 transition-all duration-100"
-          style={{ 
-            width: `${progressPercentage}%`,
-            maxWidth: 'calc(100% - 48px)'
-          }}
-        />
-      </div>
-    </div>
-  );
-};
 
 const Timeline = ({ duration, currentTime }: { duration: number; currentTime: number }) => {
   const formatTime = (seconds: number): string => {
@@ -139,11 +55,11 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
   }
 
   return (
-    <div className="h-[35px] bg-[#393839] flex items-end relative px-2">
+    <div className="h-[35px] bg-[#393839] flex items-end relative px-2 hover:bg-[#434343] transition-colors">
       {timeMarkers.map((time, index) => (
         <div 
           key={index}
-          className="absolute top-1.5 text-xs text-[#656565] font-satoshi font-bold"
+          className="absolute top-1.5 text-xs text-[#656565] font-satoshi font-bold pointer-events-none"
           style={{ left: `${1 + (time / safeDuration) * (100)}%` }}
         >
           {formatTime(time)}
@@ -152,10 +68,13 @@ const Timeline = ({ duration, currentTime }: { duration: number; currentTime: nu
       
       {/* Current time cursor */}
       <div 
-        className="absolute top-2 w-[3px] h-[210px] rounded-full bg-white shadow-lg transition-all duration-100"
+        className="absolute top-2 w-[3px] h-[210px] rounded-full bg-white shadow-lg transition-all duration-100 pointer-events-none"
         style={{ left: `${1 + (currentTime / safeDuration) * (100)}%` }}
       >
       </div>
+      
+      {/* Clickable overlay for better UX */}
+      <div className="absolute inset-0 bg-transparent hover:bg-white/5 transition-colors" />
     </div>
   );
 };
@@ -174,28 +93,19 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   // Volume states for vocals and instruments (non-vocal tracks combined)
   const [vocalsVolume, setVocalsVolume] = useState([70]);
   const [instrumentsVolume, setInstrumentsVolume] = useState([70]);
-
-  // Mock waveform data
-  const [waveforms] = useState({
-    vocals: generateMockWaveform(200),
-    drums: generateMockWaveform(200),
-    bass: generateMockWaveform(200),
-    other: generateMockWaveform(200),
-  });
-
   // Audio player hook
   const audioPlayer = useAudioPlayer();
 
-  // Debug logging with render counter
-  const renderCountRef = useRef(0);
-  renderCountRef.current += 1;
-  console.log(`AudioStudio render #${renderCountRef.current}:`, { 
-    isLoading, 
-    minLoadingComplete, 
-    hasResults: !!results, 
-    error,
-    audioPlayerLoading: audioPlayer.isLoading 
-  });
+  // Debug logging with render counter (disabled for performance)
+  // const renderCountRef = useRef(0);
+  // renderCountRef.current += 1;
+  // console.log(`AudioStudio render #${renderCountRef.current}:`, { 
+  //   isLoading, 
+  //   minLoadingComplete, 
+  //   hasResults: !!results, 
+  //   error,
+  //   audioPlayerLoading: audioPlayer.isLoading 
+  // });
 
   // Minimum loading time to prevent flickering
   useEffect(() => {
@@ -376,17 +286,36 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
   };
 
   const handleTimelineClick = async (event: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent click if duration is not loaded yet
+    if (!audioPlayer.duration || audioPlayer.duration <= 0) {
+      console.warn('Cannot seek: duration not available');
+      toast.warning('Please wait for audio to load');
+      return;
+    }
+
     const rect = event.currentTarget.getBoundingClientRect();
-    const clickX = event.clientX - rect.left - 48; // Subtract left padding
-    const timelineWidth = rect.width - 96; // Subtract both side paddings
+    const clickX = event.clientX - rect.left;
+    const timelineWidth = rect.width;
     const clickPercentage = Math.max(0, Math.min(1, clickX / timelineWidth));
     const newTime = clickPercentage * audioPlayer.duration;
     
+    console.log('Timeline click:', {
+      clickX,
+      timelineWidth,
+      clickPercentage,
+      newTime,
+      duration: audioPlayer.duration,
+      currentTime: audioPlayer.currentTime
+    });
+    
     try {
       await audioPlayer.seek(newTime);
+      console.log(`Successfully seeked to ${newTime.toFixed(2)}s`);
     } catch (error) {
       console.error('Failed to seek:', error);
-      toast.error('Seek failed');
+      toast.error('Seek failed', {
+        description: error instanceof Error ? error.message : 'Unable to jump to selected position'
+      });
     }
   };
 
@@ -535,7 +464,10 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           </div>
           <div className='w-[calc(100%-55px)] flex flex-col'>
             {/* Timeline */}
-            <div className='h-[35px] bg-[#393839] w-full'>
+            <div 
+              className='h-[35px] bg-[#393839] w-full cursor-pointer'
+              onClick={handleTimelineClick}
+            >
               <Timeline duration={audioPlayer.duration} currentTime={audioPlayer.currentTime} />
             </div>
             {/* Waveform */}
@@ -559,16 +491,16 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
               />
              <RoundedTimeline
                 file={waveformBassFile}
-                containerColor={audioPlayer.trackStates.bass?.isMuted ? "#3F1704" : "#DD2DF9"}
-                waveformColor="#EF9EFB"   /* white waveform */
+                containerColor={audioPlayer.trackStates.bass?.isMuted ? "#6B0661" : "#DD2DF9"}
+                waveformColor={audioPlayer.trackStates.bass?.isMuted ? "rgba(239, 158, 251, 0.5)" : "#EF9EFB"}
                 barRadius={26}
                 silenceRms={0.005}
                 bucketMs={10}
               />
              <RoundedTimeline
                 file={waveformDrumsFile}
-                containerColor="#4EF5C3" 
-                waveformColor="rgba(255, 255, 255, 0.7)"   /* white waveform */
+                containerColor={audioPlayer.trackStates.drums?.isMuted ? "#4ef5c366" : "#4EF5C3"} 
+                waveformColor={audioPlayer.trackStates.drums?.isMuted ? "rgba(255, 255, 255, 0.2)" : "rgba(255, 255, 255, 0.7)"}
                 barRadius={26}
                 silenceRms={0.005}
                 bucketMs={10}

@@ -42,10 +42,10 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   // Audio engine instance (persisted across renders)
   const audioEngineRef = useRef<AudioEngine | null>(null);
   
-  // Debug: Track hook renders
-  const hookRenderCount = useRef(0);
-  hookRenderCount.current += 1;
-  console.log(`useAudioPlayer hook render #${hookRenderCount.current}`);
+  // Debug: Track hook renders (disabled for performance)
+  // const hookRenderCount = useRef(0);
+  // hookRenderCount.current += 1;
+  // console.log(`useAudioPlayer hook render #${hookRenderCount.current}`);
   
   // State from audio engine
   const [engineState, setEngineState] = useState<AudioEngineState>({
@@ -65,33 +65,35 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       console.log('Initializing new AudioEngine instance');
       audioEngineRef.current = new AudioEngine();
       
-      // Set up state change callback with special handling for pause/play states
+      // Set up state change callback with proper throttling
       let lastUpdate = 0;
       let lastIsPlaying = false;
       
       audioEngineRef.current.setStateChangeCallback((newState) => {
         const now = Date.now();
         
-        // For pause/play state changes, update immediately without throttling
+        // Check if play/pause state actually changed
         const isPlayingChanged = lastIsPlaying !== newState.isPlaying;
-        lastIsPlaying = newState.isPlaying;
         
+        // Only update immediately for actual play/pause changes, otherwise throttle
         if (isPlayingChanged) {
           console.log('Play/Pause state changed immediately:', { 
-            from: !newState.isPlaying, 
+            from: lastIsPlaying, 
             to: newState.isPlaying,
             currentTime: newState.currentTime 
           });
+          lastIsPlaying = newState.isPlaying;
+          lastUpdate = now; // Reset throttle timer
           setEngineState(newState);
           if (audioEngineRef.current) {
             setTrackStates(audioEngineRef.current.getTrackStates());
           }
-        } else if (now - lastUpdate > 33) {
-          // Throttle other updates to max 30fps for smooth timeline updates
+        } else if (now - lastUpdate > 100) {
+          // Throttle time updates to 10fps to reduce re-renders
           lastUpdate = now;
           setEngineState(newState);
-          // Also update track states when engine state changes
-          if (audioEngineRef.current) {
+          // Only update track states occasionally to reduce renders
+          if (now % 500 < 100 && audioEngineRef.current) {
             setTrackStates(audioEngineRef.current.getTrackStates());
           }
         }

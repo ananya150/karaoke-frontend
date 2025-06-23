@@ -202,8 +202,10 @@ export class AudioEngine {
         }
       }
 
+      console.log('Setting isPlaying: true and starting time updates...');
       this.updateState({ isPlaying: true });
       this.startTimeUpdates();
+      console.log('=== PLAY COMPLETE ===');
       
     } catch (error) {
       console.error('Failed to start playback:', error);
@@ -269,14 +271,99 @@ export class AudioEngine {
   // Seek to specific time
   async seek(time: number): Promise<void> {
     const wasPlaying = this.getState().isPlaying;
+    const duration = this.getState().duration;
     
-    this.pause();
-    this.pausedAt = Math.max(0, Math.min(time, this.getState().duration));
-    this.updateState({ currentTime: this.pausedAt });
+    console.log('=== SEEK CALLED ===');
+    console.log('Seek to time:', time);
+    console.log('Was playing:', wasPlaying);
+    console.log('Duration:', duration);
+    
+    // Set the new position (clamp to valid range)
+    this.pausedAt = Math.max(0, Math.min(time, duration));
+    console.log('Set pausedAt to:', this.pausedAt);
     
     if (wasPlaying) {
-      await this.play();
+      // If playing, seek without changing play state
+      await this.seekWhilePlaying(this.pausedAt);
+    } else {
+      // If paused, use normal pause method and just update position
+      console.log('Seeking while paused - maintaining paused state');
+      this.pause();
+      this.updateState({ currentTime: this.pausedAt });
     }
+    
+    console.log('=== SEEK COMPLETE ===');
+  }
+
+  // Internal method to seek while maintaining playback
+  private async seekWhilePlaying(newTime: number): Promise<void> {
+    if (!this.audioContext || !this.masterGainNode) {
+      throw new Error('Audio engine not initialized');
+    }
+
+    console.log('Seeking while playing to:', newTime);
+
+    // Temporarily stop time updates to prevent interference
+    this.stopTimeUpdates();
+
+    // Stop current sources silently
+    for (const track of this.tracks.values()) {
+      if (track.source) {
+        try {
+          track.source.stop(0);
+        } catch {
+          // Ignore errors
+        }
+        track.source = null;
+      }
+    }
+
+    // Create new sources starting from the new position
+    // Add a small delay to ensure clean audio context state
+    const startDelay = 0.01; // 10ms delay
+    const currentTime = this.audioContext.currentTime + startDelay;
+    this.startTime = currentTime - newTime;
+
+    let sourcesCreated = 0;
+    for (const track of this.tracks.values()) {
+      if (track.buffer) {
+        // Create new source and gain nodes
+        track.source = this.audioContext.createBufferSource();
+        track.gainNode = this.audioContext.createGain();
+        
+        // Set up audio graph
+        track.source.buffer = track.buffer;
+        track.source.connect(track.gainNode);
+        track.gainNode.connect(this.masterGainNode);
+        
+        // Apply current volume and mute settings
+        this.updateTrackGain(track);
+        
+        // Validate seek position against buffer length
+        const bufferDuration = track.buffer.duration;
+        const safeSeekTime = Math.min(newTime, bufferDuration - 0.1); // Leave 0.1s buffer
+        
+        console.log(`Starting track ${track.name}: seekTime=${newTime}, bufferDuration=${bufferDuration}, safeSeekTime=${safeSeekTime}`);
+        
+        // Start playback from new position
+        track.source.start(currentTime, safeSeekTime);
+        sourcesCreated++;
+        
+        // Don't set onended callback during seek - will be set by normal play() method
+        // The time updates will handle end-of-track detection
+        track.source.onended = null;
+      }
+    }
+
+    console.log(`Created ${sourcesCreated} new sources at position ${newTime}`);
+    
+    // Update current time immediately but keep isPlaying: true
+    console.log('Updating state with isPlaying: true and currentTime:', newTime);
+    this.updateState({ currentTime: newTime, isPlaying: true });
+    console.log('State update complete');
+    
+    // Restart time updates
+    this.startTimeUpdates();
   }
 
   // Set track volume (0-100)
@@ -381,15 +468,31 @@ export class AudioEngine {
   }
 
   private startTimeUpdates(): void {
+    console.log('startTimeUpdates() called');
     this.stopTimeUpdates();
     
+    let updateCount = 0;
     const updateTime = () => {
+      updateCount++;
       const isPlaying = this.tracks.size > 0 && Array.from(this.tracks.values()).some(track => track.source !== null);
       const currentTime = this.getCurrentTime(isPlaying);
       const duration = Array.from(this.tracks.values()).find(track => track.buffer)?.buffer?.duration || 0;
       
+      // Debug first few updates
+      if (updateCount <= 5) {
+        console.log(`Time update ${updateCount}:`, {
+          isPlaying,
+          currentTime,
+          duration,
+          startTime: this.startTime,
+          pausedAt: this.pausedAt,
+          audioContextCurrentTime: this.audioContext?.currentTime
+        });
+      }
+      
       // Check if we've reached the end
       if (currentTime >= duration && duration > 0) {
+        console.log('Reached end of track, pausing');
         this.pause();
         this.pausedAt = duration;
         this.updateState({ currentTime: duration, isPlaying: false });
@@ -400,9 +503,12 @@ export class AudioEngine {
       
       if (isPlaying) {
         this.animationFrameId = requestAnimationFrame(updateTime);
+      } else {
+        console.log('Stopped time updates because isPlaying is false');
       }
     };
     
+    console.log('Starting first time update...');
     this.animationFrameId = requestAnimationFrame(updateTime);
   }
 
@@ -424,6 +530,14 @@ export class AudioEngine {
         .some(track => track.source !== null);
       const isPlaying = partialState.isPlaying !== undefined ? partialState.isPlaying : calculatedIsPlaying;
       
+      // Debug logging for seek operations
+      if (partialState.isPlaying !== undefined) {
+        console.log('updateState called with explicit isPlaying:', partialState.isPlaying);
+        console.log('calculatedIsPlaying:', calculatedIsPlaying);
+        console.log('final isPlaying:', isPlaying);
+        console.log('sources exist:', Array.from(this.tracks.values()).map(t => ({ name: t.name, hasSource: !!t.source })));
+      }
+      
       const currentState: AudioEngineState = {
         isPlaying,
         currentTime: this.getCurrentTime(isPlaying),
@@ -433,6 +547,12 @@ export class AudioEngine {
       };
       
       const newState = { ...currentState, ...partialState };
+      
+      // Debug final state
+      if (partialState.isPlaying !== undefined) {
+        console.log('Final state sent to callback:', newState);
+      }
+      
       this.stateChangeCallback(newState);
     }
   }
