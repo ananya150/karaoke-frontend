@@ -9,7 +9,7 @@ import {
   ApiError,
   NetworkError 
 } from '@/types/api';
-import { toast } from 'sonner';
+// import { toast } from 'sonner'; // Commented out since toast calls are disabled
 
 interface UseJobStatusOptions {
   jobId: string;
@@ -123,9 +123,9 @@ export function useJobStatus({
       
       if (!isMountedRef.current) return;
       
-      toast.success('Processing completed!', {
-        description: 'Your audio has been successfully processed into separate tracks.',
-      });
+      // toast.success('Processing completed!', {
+      //   description: 'Your audio has been successfully processed into separate tracks.',
+      // });
       
       // Call completion callback
       if (onComplete) {
@@ -139,9 +139,9 @@ export function useJobStatus({
       
     } catch (err) {
       console.error('Failed to fetch results:', err);
-      toast.error('Failed to fetch results', {
-        description: 'Processing completed but results could not be retrieved.',
-      });
+      // toast.error('Failed to fetch results', {
+      //   description: 'Processing completed but results could not be retrieved.',
+      // });
     }
   }, [jobId, onComplete, autoRedirect, router]);
 
@@ -149,9 +149,9 @@ export function useJobStatus({
   const handleFailure = useCallback((status: JobStatusResponse) => {
     const errorMessage = status.error_message || 'Processing failed for unknown reason';
     
-    toast.error('Processing failed', {
-      description: errorMessage,
-    });
+    // toast.error('Processing failed', {
+    //   description: errorMessage,
+    // });
     
     if (onError) {
       onError(new Error(errorMessage));
@@ -214,15 +214,12 @@ export function useJobStatus({
         return;
       }
       
-      // Continue polling for processing/queued status (case-insensitive)
-      if (statusLower === 'processing' || statusLower === 'queued') {
-        console.log(`🔄 POLL: Job still ${response.status}, scheduling next poll in ${pollInterval}ms`);
-        // Schedule next poll
-        if (isMountedRef.current && isPollingRef.current) {
-          pollIntervalRef.current = setTimeout(pollOnce, pollInterval);
-        }
-      } else {
-        console.log('⚠️ POLL: Unknown status, not scheduling next poll:', response.status);
+      // Continue polling for any status that isn't completed or failed
+      // This ensures we keep polling even for new processing steps like beat analysis
+      console.log(`🔄 POLL: Job status ${response.status}, continuing to poll in ${pollInterval}ms`);
+      // Schedule next poll
+      if (isMountedRef.current && isPollingRef.current) {
+        pollIntervalRef.current = setTimeout(pollOnce, pollInterval);
       }
       
     } catch (err) {
@@ -248,9 +245,9 @@ export function useJobStatus({
         const errorMessage = err instanceof Error ? err.message : 'Polling failed after maximum retries';
         setError(errorMessage);
         
-        toast.error('Connection lost', {
-          description: 'Unable to track processing progress. You can check back later.',
-        });
+        // toast.error('Connection lost', {
+        //   description: 'Unable to track processing progress. You can check back later.',
+        // });
       }
     }
   }, [

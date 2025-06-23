@@ -133,9 +133,9 @@ export function FileUpload({ onUploadSuccess, className }: FileUploadProps) {
         setUploadProgress(progress);
       });
 
-      toast.success('File uploaded successfully!', {
-        description: `Processing started. Job ID: ${result.job_id}`,
-      });
+      // toast.success('File uploaded successfully!', {
+      //   description: `Processing started. Job ID: ${result.job_id}`,
+      // });
 
       // Navigate to processing page or call success callback
       if (onUploadSuccess) {

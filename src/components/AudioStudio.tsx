@@ -534,7 +534,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
           
           if (!isCancelled) {
             console.log('Audio tracks loaded, checking states:', audioPlayer.trackStates);
-            toast.success('Audio tracks loaded successfully!');
+            // toast.success('Audio tracks loaded successfully!');
           }
         } else {
           console.warn('No audio track URLs found. Available download links:', Object.keys(results.download_links));
@@ -630,7 +630,7 @@ export function AudioStudio({ jobId }: AudioStudioProps) {
         console.log('🎵 Beat times sample:', beatData.beat_times.slice(0, 20));
         
         setBeatData(beatData);
-        toast.success(`Beat visualization loaded! Found ${beatTimes.length} beats`);
+        // toast.success(`Beat visualization loaded! Found ${beatTimes.length} beats`);
         
       } catch (error) {
         console.error('❌ Failed to load beat data:', error);
